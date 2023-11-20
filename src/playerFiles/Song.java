@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class Song implements AudioFile {
+public class Song extends AudioFile {
     private String name;
     private int duration;
     private String album;

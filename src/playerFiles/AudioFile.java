@@ -1,6 +1,11 @@
 package playerFiles;
 
-public interface AudioFile {
-    String name = null;
-    int duration = 0;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+public class AudioFile {
+    private String name;
+    private String fileType;
 }

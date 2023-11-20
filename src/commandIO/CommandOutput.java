@@ -2,6 +2,7 @@ package commandIO;
 
 import lombok.Getter;
 import lombok.Setter;
+import musicPlayer.Stats;
 
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ public class CommandOutput {
     int timestamp;
     String message;
     ArrayList<String> result = new ArrayList<>();
+    Stats stats;
 
     @Override
     public String toString() {
@@ -22,6 +24,7 @@ public class CommandOutput {
                 ", timestamp=" + timestamp +
                 ", message='" + message + '\'' +
                 ", result=" + result +
+                ", stats=" + stats +
                 '}';
     }
 }

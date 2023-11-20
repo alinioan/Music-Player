@@ -2,18 +2,22 @@ package musicPlayer;
 
 import commandIO.CommandInput;
 import commandIO.CommandOutput;
-import playerFiles.Library;
-import playerFiles.Playlist;
-import playerFiles.Podcast;
-import playerFiles.Song;
+import lombok.Getter;
+import lombok.Setter;
+import playerFiles.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public class SearchBar {
     private ArrayList<Song> songResults = new ArrayList<>();
     private ArrayList<Podcast> podcastResults = new ArrayList<>();
     private ArrayList<Playlist> playlistResults = new ArrayList<>();
+
+    private AudioFile selectedAudioFile = null;
+
 
     CommandOutput processCommand(CommandInput command, Library library) {
         switch (command.getCommand()) {
@@ -161,22 +165,28 @@ public class SearchBar {
             if (this.songResults.size() < itemNumber) {
                 output.setMessage("The selected ID is too high.");
             } else {
-                Song selectedSong = this.songResults.get(itemNumber - 1);
-                output.setMessage("Successfully selected " + selectedSong.getName() + ".");
+                this.selectedAudioFile = this.songResults.get(itemNumber - 1);
+                this.selectedAudioFile.setName(this.songResults.get(itemNumber - 1).getName());
+                this.selectedAudioFile.setFileType("song");
+                output.setMessage("Successfully selected " + this.selectedAudioFile.getName() + ".");
             }
         } else if (this.podcastResults != null && !this.podcastResults.isEmpty()) {
             if (this.podcastResults.size() < itemNumber) {
                 output.setMessage("The selected ID is too high.");
             } else {
-                Podcast selectedPodcast = this.podcastResults.get(itemNumber - 1);
-                output.setMessage("Successfully selected " + selectedPodcast.getName() + ".");
+                this.selectedAudioFile = this.podcastResults.get(itemNumber - 1);
+                this.selectedAudioFile.setName(this.podcastResults.get(itemNumber - 1).getName());
+                this.selectedAudioFile.setFileType("podcast");
+                output.setMessage("Successfully selected " + this.selectedAudioFile.getName() + ".");
             }
         } else if (this.playlistResults != null && !this.playlistResults.isEmpty()) {
             if (this.playlistResults.size() < itemNumber) {
                 output.setMessage("The selected ID is too high.");
             } else {
-                Playlist selectedPlaylist = this.playlistResults.get(itemNumber - 1);
-                output.setMessage("Successfully selected " + selectedPlaylist.getName() + ".");
+                this.selectedAudioFile = this.playlistResults.get(itemNumber - 1);
+                this.selectedAudioFile.setName(this.playlistResults.get(itemNumber - 1).getName());
+                this.selectedAudioFile.setFileType("playlist");
+                output.setMessage("Successfully selected " + this.selectedAudioFile.getName() + ".");
             }
         } else {
             output.setMessage("Please conduct a search before making a selection.");

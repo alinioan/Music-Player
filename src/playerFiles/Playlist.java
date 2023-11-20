@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 @Setter
 @Getter
-public class Playlist {
+public class Playlist extends AudioFile {
     private String name;
     private String visibility;
     private String owner;

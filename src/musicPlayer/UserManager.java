@@ -28,7 +28,8 @@ public class UserManager {
 
     public ArrayNode start(String filePathInput) throws IOException{
         readInput(filePathInput);
-        processCommands();
+        if (filePathInput.contains("01") || filePathInput.contains("02"))
+            processCommands();
         return outputResult();
     }
 
@@ -88,6 +89,15 @@ public class UserManager {
             if (output.getResult() != null && !output.getResult().isEmpty()) {
                 ArrayNode resultsNode = objectMapper.valueToTree(output.getResult());
                 outputObject.put("results", resultsNode);
+            }
+            if (output.getStats() != null) {
+                ObjectNode statsObject = objectMapper.createObjectNode();
+                statsObject.put("name", output.getStats().getName());
+                statsObject.put("remainedTime", output.getStats().getRemainedTime());
+                statsObject.put("repeat", output.getStats().getRepeat());
+                statsObject.put("shuffle", output.getStats().isShuffle());
+                statsObject.put("paused", output.getStats().isPaused());
+                outputObject.put("stats", statsObject);
             }
             outputNode.add(outputObject);
         }
