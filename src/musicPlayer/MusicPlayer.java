@@ -1,6 +1,7 @@
 package musicPlayer;
 
 import commandIO.CommandInput;
+import commandIO.CommandOutput;
 import playerFiles.Library;
 
 
@@ -12,7 +13,7 @@ public class MusicPlayer {
     private int durationPassedInCurrentFile;
     private SearchBar searchBar = new SearchBar();
 
-    public void processCommand(CommandInput command, Library library) {
+    public CommandOutput processCommand(CommandInput command, Library library) {
         switch (command.getCommand()) {
             case "load":
                 break;
@@ -35,9 +36,10 @@ public class MusicPlayer {
             case "status":
                 break;
             default:
-                this.searchBar.processCommand(command, library);
-                break;
+                return this.searchBar.processCommand(command, library);
         }
+        return null;
     }
+
 
 }

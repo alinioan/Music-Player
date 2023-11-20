@@ -1,6 +1,7 @@
 package musicPlayer;
 
 import commandIO.CommandInput;
+import commandIO.CommandOutput;
 import playerFiles.Library;
 import playerFiles.Playlist;
 import playerFiles.Podcast;
@@ -14,56 +15,82 @@ public class SearchBar {
     private ArrayList<Podcast> podcastResults = new ArrayList<>();
     private ArrayList<Playlist> playlistResults = new ArrayList<>();
 
-    void processCommand(CommandInput command, Library library) {
+    CommandOutput processCommand(CommandInput command, Library library) {
         switch (command.getCommand()) {
             case "search":
-                search(command.getType(), command.getFilters(), library);
-                break;
+                return search(command.getType(), command.getFilters(), library);
             case "select":
+                return select(command.getItemNumber());
+            default:
+                break;
+        }
+        return null;
+    }
+    CommandOutput search(String type, Filters filters, Library library) {
+        this.songResults.clear();
+        this.playlistResults.clear();
+        this.podcastResults.clear();
+        CommandOutput output = new CommandOutput();
+        switch (type) {
+            case "song":
+                filterSong(filters, library);
+                output.setMessage("Search returned " + this.songResults.size() + " results");
+                for (Song song : this.songResults) {
+                    output.getResult().add(song.getName());
+                }
+                break;
+            case "playlist":
+                filterPlaylist(filters, library);
+                output.setMessage("Search returned " + this.playlistResults.size() + " results");
+                for (Playlist playlist : this.playlistResults) {
+                    output.getResult().add(playlist.getName());
+                }
+                break;
+            case "podcast":
+                filterPodcasts(filters, library);
+                output.setMessage("Search returned " + this.podcastResults.size() + " results");
+                for (Podcast podcast : this.podcastResults) {
+                    output.getResult().add(podcast.getName());
+                }
                 break;
             default:
                 break;
         }
+        return output;
     }
-    void search(String type, Filters filters, Library library) {
-        this.songResults.clear();
-        this.playlistResults.clear();
-        this.podcastResults.clear();
-        switch (type) {
-            case "song":
-                this.songResults.addAll(library.getSongs());
-                filterSongByName(filters.getName());
-                filterSongsByAlbum(filters.getAlbum());
-                filterSongsByArtist(filters.getArtist());
-                filterSongsByGenre(filters.getGenre());
-                filterSongsByLyrics(filters.getLyrics());
-                filterSongsByYear(filters.getReleaseYear());
-                filterSongsByTags(filters.getTags());
-                if (this.songResults.size() > 5) {
-                    List<Song> sublist = this.songResults.subList(5, this.songResults.size());
-                    sublist.clear();
-                }
-                break;
-            case "playlist":
-                this.playlistResults.addAll(library.getPlaylists());
-                filterRestByName(filters.getName());
-                filterRestByOwner(filters.getOwner());
-                if (this.playlistResults.size() > 5) {
-                    List<Playlist> sublist = this.playlistResults.subList(5, this.playlistResults.size());
-                    sublist.clear();
-                }
-                break;
-            case "podcast":
-                this.podcastResults.addAll(library.getPodcasts());
-                filterRestByName(filters.getName());
-                filterRestByOwner(filters.getOwner());
-                if (this.podcastResults.size() > 5) {
-                    List<Podcast> sublist = this.podcastResults.subList(5, this.podcastResults.size());
-                    sublist.clear();
-                }
-                break;
-            default:
-                break;
+
+    void filterSong(Filters filters, Library library) {
+        this.songResults.addAll(library.getSongs());
+        filterSongByName(filters.getName());
+        filterSongsByAlbum(filters.getAlbum());
+        filterSongsByArtist(filters.getArtist());
+        filterSongsByGenre(filters.getGenre());
+        filterSongsByLyrics(filters.getLyrics());
+        filterSongsByYear(filters.getReleaseYear());
+        filterSongsByTags(filters.getTags());
+        if (this.songResults.size() > 5) {
+            List<Song> sublist = this.songResults.subList(5, this.songResults.size());
+            sublist.clear();
+        }
+    }
+
+    void filterPlaylist(Filters filters, Library library) {
+        this.playlistResults.addAll(library.getPlaylists());
+        filterRestByName(filters.getName());
+        filterRestByOwner(filters.getOwner());
+        if (this.playlistResults.size() > 5) {
+            List<Playlist> sublist = this.playlistResults.subList(5, this.playlistResults.size());
+            sublist.clear();
+        }
+    }
+
+    void filterPodcasts(Filters filters, Library library) {
+        this.podcastResults.addAll(library.getPodcasts());
+        filterRestByName(filters.getName());
+        filterRestByOwner(filters.getOwner());
+        if (this.podcastResults.size() > 5) {
+            List<Podcast> sublist = this.podcastResults.subList(5, this.podcastResults.size());
+            sublist.clear();
         }
     }
 
@@ -128,7 +155,32 @@ public class SearchBar {
             this.playlistResults.removeIf(playlist -> !playlist.getOwner().equals(name));
         }
     }
-    void select() {
-
+    CommandOutput select(int itemNumber) {
+        CommandOutput output = new CommandOutput();
+        if (this.songResults != null && !this.songResults.isEmpty()) {
+            if (this.songResults.size() < itemNumber) {
+                output.setMessage("The selected ID is too high.");
+            } else {
+                Song selectedSong = this.songResults.get(itemNumber - 1);
+                output.setMessage("Successfully selected " + selectedSong.getName() + ".");
+            }
+        } else if (this.podcastResults != null && !this.podcastResults.isEmpty()) {
+            if (this.podcastResults.size() < itemNumber) {
+                output.setMessage("The selected ID is too high.");
+            } else {
+                Podcast selectedPodcast = this.podcastResults.get(itemNumber - 1);
+                output.setMessage("Successfully selected " + selectedPodcast.getName() + ".");
+            }
+        } else if (this.playlistResults != null && !this.playlistResults.isEmpty()) {
+            if (this.playlistResults.size() < itemNumber) {
+                output.setMessage("The selected ID is too high.");
+            } else {
+                Playlist selectedPlaylist = this.playlistResults.get(itemNumber - 1);
+                output.setMessage("Successfully selected " + selectedPlaylist.getName() + ".");
+            }
+        } else {
+            output.setMessage("Please conduct a search before making a selection.");
+        }
+        return output;
     }
 }

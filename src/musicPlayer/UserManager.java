@@ -2,6 +2,8 @@ package musicPlayer;
 
 import checker.CheckerConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import commandIO.CommandInput;
 import commandIO.CommandOutput;
 import playerFiles.Library;
@@ -22,13 +24,12 @@ public class UserManager {
     HashMap<String, User> users = new HashMap<>();
     ArrayList<CommandInput> input;
     static int commandId = 0;
-    CommandOutput output;
+    ArrayList<CommandOutput> outputs = new ArrayList<>();
 
-    public void start(String filePathInput) throws IOException{
+    public ArrayNode start(String filePathInput) throws IOException{
         readInput(filePathInput);
-        // TODO: !!!!!!!!!!!!!!!!!!!!remove this!!!!!!!!!!!!!!!!!!!!
-        if (filePathInput.contains("01"))
-            processCommands();
+        processCommands();
+        return outputResult();
     }
 
     void readInput(String filePathInput) throws IOException {
@@ -46,7 +47,13 @@ public class UserManager {
     void processCommands() {
         for (CommandInput command : this.input) {
             User user = users.get(command.getUsername());
-            user.getPlayer().processCommand(command, library);
+            CommandOutput crtOutput = user.getPlayer().processCommand(command, library);
+            if (crtOutput == null)
+                continue; // TODO: temporary until all commands are implemented
+            crtOutput.setUser(user.getUsername());
+            crtOutput.setCommand(command.getCommand());
+            crtOutput.setTimestamp(command.getTimestamp());
+            this.outputs.add(crtOutput);
 //            switch (command.getCommand()) {
 //                case "createPlaylist":
 //                    break;
@@ -64,5 +71,26 @@ public class UserManager {
 //                    break;
 //            }
         }
+    }
+    ArrayNode outputResult() {
+        if (this.outputs == null || this.outputs.isEmpty())
+            return null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode outputNode = objectMapper.createArrayNode();
+        for (CommandOutput output : this.outputs) {
+            ObjectNode outputObject = objectMapper.createObjectNode();
+            outputObject.put("command", output.getCommand());
+            outputObject.put("user", output.getUser());
+            outputObject.put("timestamp", output.getTimestamp());
+            if (output.getMessage() != null) {
+                outputObject.put("message", output.getMessage());
+            }
+            if (output.getResult() != null && !output.getResult().isEmpty()) {
+                ArrayNode resultsNode = objectMapper.valueToTree(output.getResult());
+                outputObject.put("results", resultsNode);
+            }
+            outputNode.add(outputObject);
+        }
+        return outputNode;
     }
 }

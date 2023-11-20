@@ -12,6 +12,16 @@ public class CommandOutput {
     String user;
     int timestamp;
     String message;
-    ArrayList<String> result;
+    ArrayList<String> result = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "CommandOutput{" +
+                "command='" + command + '\'' +
+                ", user='" + user + '\'' +
+                ", timestamp=" + timestamp +
+                ", message='" + message + '\'' +
+                ", result=" + result +
+                '}';
+    }
 }

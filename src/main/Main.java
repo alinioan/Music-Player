@@ -75,7 +75,7 @@ public final class Main {
         ArrayNode outputs = objectMapper.createArrayNode();
 
         UserManager manager = new UserManager();
-        manager.start(filePathInput);
+        outputs = manager.start(filePathInput);
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePathOutput), outputs);
