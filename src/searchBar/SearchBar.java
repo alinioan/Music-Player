@@ -1,4 +1,4 @@
-package musicPlayer;
+package searchBar;
 
 import commandIO.CommandInput;
 import commandIO.CommandOutput;
@@ -19,7 +19,7 @@ public class SearchBar {
     private AudioFile selectedAudioFile = null;
 
 
-    CommandOutput processCommand(CommandInput command, Library library) {
+    public CommandOutput processCommand(CommandInput command, Library library) {
         switch (command.getCommand()) {
             case "search":
                 return search(command.getType(), command.getFilters(), library);
@@ -118,7 +118,7 @@ public class SearchBar {
     void filterSongsByLyrics(String lyrics) {
         if (lyrics == null)
             return;
-        this.songResults.removeIf(song -> !song.getLyrics().contains(lyrics));
+        this.songResults.removeIf(song -> !song.getLyrics().toLowerCase().contains(lyrics));
     }
     void filterSongsByGenre(String genre) {
         if (genre == null)

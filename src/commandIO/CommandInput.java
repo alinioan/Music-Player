@@ -2,9 +2,7 @@ package commandIO;
 
 import lombok.Getter;
 import lombok.Setter;
-import musicPlayer.Filters;
-
-import java.util.ArrayList;
+import searchBar.Filters;
 
 @Getter
 @Setter

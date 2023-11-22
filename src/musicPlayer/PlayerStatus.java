@@ -5,16 +5,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Stats {
+public class PlayerStatus {
     private String name;
     private int remainedTime;
     private String repeat;
     private boolean shuffle;
     private boolean paused;
 
-    public Stats() {}
+    public PlayerStatus() {}
 
-    public Stats(String name, int remainedTime, String repeat, boolean shuffle, boolean paused) {
+    public PlayerStatus(String name, int remainedTime, String repeat, boolean shuffle, boolean paused) {
         this.name = name;
         this.remainedTime = remainedTime;
         this.repeat = repeat;

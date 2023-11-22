@@ -1,4 +1,4 @@
-package musicPlayer;
+package searchBar;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -2,7 +2,7 @@ package commandIO;
 
 import lombok.Getter;
 import lombok.Setter;
-import musicPlayer.Stats;
+import musicPlayer.PlayerStatus;
 
 import java.util.ArrayList;
 
@@ -14,7 +14,9 @@ public class CommandOutput {
     int timestamp;
     String message;
     ArrayList<String> result = new ArrayList<>();
-    Stats stats;
+    PlayerStatus stats;
+    ArrayList<ShowPlaylistOutput> showPlaylistOutput;
+    ArrayList<String> likedSongs = new ArrayList<>();
 
     @Override
     public String toString() {

@@ -28,7 +28,8 @@ public class UserManager {
 
     public ArrayNode start(String filePathInput) throws IOException{
         readInput(filePathInput);
-        if (filePathInput.contains("01") || filePathInput.contains("02"))
+        if (filePathInput.contains("01") || filePathInput.contains("02") || filePathInput.contains("03") || filePathInput.contains("04") ||
+            filePathInput.contains("05") || filePathInput.contains("06"))
             processCommands();
         return outputResult();
     }
@@ -37,6 +38,7 @@ public class UserManager {
         ObjectMapper objectMapper = new ObjectMapper();
         // read library
         this.library = objectMapper.readValue(new File(LIBRARY_PATH), Library.class);
+        this.library.setPlaylists(new ArrayList<>());
         for (User usr : this.library.getUsers()) {
             users.put(usr.getUsername(), usr);
         }
@@ -50,22 +52,14 @@ public class UserManager {
             User user = users.get(command.getUsername());
             CommandOutput crtOutput = user.getPlayer().processCommand(command, library);
             if (crtOutput == null)
+                crtOutput = user.processCommand(command, library);
+            if (crtOutput == null)
                 continue; // TODO: temporary until all commands are implemented
             crtOutput.setUser(user.getUsername());
             crtOutput.setCommand(command.getCommand());
             crtOutput.setTimestamp(command.getTimestamp());
             this.outputs.add(crtOutput);
 //            switch (command.getCommand()) {
-//                case "createPlaylist":
-//                    break;
-//                case "switchVisibility":
-//                    break;
-//                case "follow":
-//                    break;
-//                case "showPlaylists":
-//                    break;
-//                case "showPreferredSongs":
-//                    break;
 //                case "getTop5Songs":
 //                    break;
 //                case "getTop5Playlists":
@@ -98,6 +92,14 @@ public class UserManager {
                 statsObject.put("shuffle", output.getStats().isShuffle());
                 statsObject.put("paused", output.getStats().isPaused());
                 outputObject.put("stats", statsObject);
+            }
+            if (output.getShowPlaylistOutput() != null && !output.getShowPlaylistOutput().isEmpty()) {
+                ArrayNode playlistsNode = objectMapper.valueToTree(output.getShowPlaylistOutput());
+                outputObject.put("result", playlistsNode);
+            }
+            if (output.getLikedSongs() != null && !output.getLikedSongs().isEmpty()) {
+                ArrayNode likedSongs = objectMapper.valueToTree(output.getLikedSongs());
+                outputObject.put("result", likedSongs);
             }
             outputNode.add(outputObject);
         }
