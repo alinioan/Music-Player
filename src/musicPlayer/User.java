@@ -72,7 +72,6 @@ public class User {
             loadedSong = (Song)loadedFile;
         }
         int index = this.likedSongs.indexOf(loadedSong);
-        System.out.println(command.getTimestamp());
         if (index == -1) {
             index = library.getSongs().indexOf(loadedSong);
             Song likedSong = library.getSongs().get(index);

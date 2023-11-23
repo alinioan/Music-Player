@@ -29,7 +29,7 @@ public class UserManager {
     public ArrayNode start(String filePathInput) throws IOException{
         readInput(filePathInput);
         if (filePathInput.contains("01") || filePathInput.contains("02") || filePathInput.contains("03") || filePathInput.contains("04") ||
-            filePathInput.contains("05") || filePathInput.contains("06"))
+            filePathInput.contains("05") || filePathInput.contains("06") || filePathInput.contains("07") || filePathInput.contains("08"))
             processCommands();
         return outputResult();
     }
@@ -80,9 +80,12 @@ public class UserManager {
             if (output.getMessage() != null) {
                 outputObject.put("message", output.getMessage());
             }
-            if (output.getResult() != null && !output.getResult().isEmpty()) {
-                ArrayNode resultsNode = objectMapper.valueToTree(output.getResult());
-                outputObject.put("results", resultsNode);
+            if (output.getResult() != null) {
+                ArrayNode resultsNode;
+                if (output.getCommand().equals("search") || !output.getResult().isEmpty()) {
+                    resultsNode = objectMapper.valueToTree(output.getResult());
+                    outputObject.put("results", resultsNode);
+                }
             }
             if (output.getStats() != null) {
                 ObjectNode statsObject = objectMapper.createObjectNode();
