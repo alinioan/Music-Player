@@ -21,6 +21,16 @@ public class Podcast extends AudioFile {
         this.episodes = episodes;
     }
 
+    public int getPreviousEpTime(PodcastEpisode currentEp) {
+        int previousSongsTime = 0;
+        for (PodcastEpisode ep : this.episodes) {
+            if (ep.equals(currentEp))
+                return previousSongsTime;
+            previousSongsTime += ep.getDuration();
+        }
+        return previousSongsTime;
+    }
+
     @Override
     public AudioFile deepCopy() {
         AudioFile file = super.deepCopy();

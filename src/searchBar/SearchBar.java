@@ -118,7 +118,7 @@ public class SearchBar {
     void filterSongsByLyrics(String lyrics) {
         if (lyrics == null)
             return;
-        this.songResults.removeIf(song -> !song.getLyrics().toLowerCase().contains(lyrics));
+        this.songResults.removeIf(song -> !song.getLyrics().toLowerCase().contains(lyrics) && !song.getLyrics().toLowerCase().contains(lyrics.toLowerCase()) );
     }
     void filterSongsByGenre(String genre) {
         if (genre == null)

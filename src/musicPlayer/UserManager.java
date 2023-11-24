@@ -30,7 +30,7 @@ public class UserManager {
         readInput(filePathInput);
         if (filePathInput.contains("01") || filePathInput.contains("02") || filePathInput.contains("03") || filePathInput.contains("04") ||
             filePathInput.contains("05") || filePathInput.contains("06") || filePathInput.contains("07") || filePathInput.contains("08") ||
-            filePathInput.contains("09") || filePathInput.contains("10"))
+            filePathInput.contains("09") || filePathInput.contains("10") || filePathInput.contains("11") || filePathInput.contains("12"))
             processCommands();
         return outputResult();
     }
