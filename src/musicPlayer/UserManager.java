@@ -29,7 +29,8 @@ public class UserManager {
     public ArrayNode start(String filePathInput) throws IOException{
         readInput(filePathInput);
         if (filePathInput.contains("01") || filePathInput.contains("02") || filePathInput.contains("03") || filePathInput.contains("04") ||
-            filePathInput.contains("05") || filePathInput.contains("06") || filePathInput.contains("07") || filePathInput.contains("08"))
+            filePathInput.contains("05") || filePathInput.contains("06") || filePathInput.contains("07") || filePathInput.contains("08") ||
+            filePathInput.contains("09") || filePathInput.contains("10"))
             processCommands();
         return outputResult();
     }

@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 @Setter
 @Getter
@@ -12,7 +14,9 @@ public class Playlist extends AudioFile {
     private String visibility;
     private String owner;
     private int id;
+    private ArrayList<Song> mainSongs;
     private ArrayList<Song> songs;
+    private ArrayList<Song> shuffled = new ArrayList<>();
     int followers = 0;
 
     public  Playlist() {}
@@ -23,6 +27,34 @@ public class Playlist extends AudioFile {
         this.owner = owner;
         this.id = id;
         this.songs = songs;
+        this.mainSongs = songs;
+    }
+
+    public int getPreviousSongsTime(Song currentSong, String list) {
+        ArrayList<Song> songs = this.getMainSongs();
+        switch (list) {
+            case "songs":
+                songs = this.getSongs();
+                break;
+            case "shuffled":
+                songs = this.getShuffled();
+                break;
+            default:
+                break;
+        }
+        int previousSongsTime = 0;
+        for (Song song : songs) {
+            if (song.equals(currentSong))
+                return previousSongsTime;
+            previousSongsTime += song.getDuration();
+        }
+        return previousSongsTime;
+    }
+
+    public void generateShuffled(int seed) {
+        Random rand = new Random(seed);
+        this.shuffled.addAll(this.songs);
+        Collections.shuffle(this.shuffled, rand);
     }
 
     @Override
@@ -36,6 +68,8 @@ public class Playlist extends AudioFile {
         copy.owner = getOwner();
         copy.id = getId();
         copy.songs = getSongs();
+        copy.mainSongs = getMainSongs();
+        copy.shuffled = getShuffled();
         return copy;
     }
 

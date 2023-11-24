@@ -35,7 +35,7 @@ public class MusicPlayer {
             case "repeat":
                 return repeat(command);
             case "shuffle":
-                break;
+                return shuffle(command);
             case "forward":
                 break;
             case "backward":
@@ -68,6 +68,7 @@ public class MusicPlayer {
                 if (((Playlist)this.searchBar.getSelectedAudioFile()).getSongs().isEmpty()) {
                     output.setMessage("You can't load an empty audio collection!");
                 }
+                ((Playlist) this.loadedFile).setMainSongs(((Playlist) this.loadedFile).getSongs());
             } else if (this.loadedFile.getFileType().equals("podcast")) {
                 if (!this.podcastElapsedTime.isEmpty())
                     this.elapsedTime = this.podcastElapsedTime.get(this.loadedFile.getName());
@@ -99,17 +100,10 @@ public class MusicPlayer {
                     break;
                 case "Repeat All":
                     this.repeatedSong = getSongFromPlaylist(command.getTimestamp());
-                    ArrayList<Song> songs = ((Playlist) this.loadedFile).getSongs();
-                    int previousSongsTime = 0;
-                    for (int i = 0; i < songs.size(); i++) {
-                        if (songs.get(i).equals(this.repeatedSong))
-                            break;
-                        previousSongsTime += songs.get(i).getDuration();
-                    }
+                    int previousSongsTime = ((Playlist) this.loadedFile).getPreviousSongsTime(this.repeatedSong, "main");
                     this.playlistRepeatStartTime = this.startTime + //this.elapsedTime +
-                            ((command.getTimestamp() - this.startTime) / this.loadedFile.getFileDuration()) * loadedFile.getFileDuration();;
+                            ((command.getTimestamp() - this.startTime) / this.loadedFile.getFileDuration()) * loadedFile.getFileDuration();
                     this.repeatStartTime = this.playlistRepeatStartTime + previousSongsTime;
-                    System.out.println("playlist repeat: " + this.playlistRepeatStartTime + " crt: " + command.getTimestamp() + " repaet start: " + this.repeatStartTime + " song: " + this.repeatedSong.getDuration());
                     this.repeatState = "Repeat Current Song";
                     break;
                 case "Repeat Current Song":
@@ -168,6 +162,49 @@ public class MusicPlayer {
         return output;
     }
 
+    private CommandOutput shuffle(CommandInput command) {
+        CommandOutput output = new CommandOutput();
+        if (this.loadedFile == null) {
+            output.setMessage("Please load a source before using the shuffle function.");
+            return output;
+        }
+        if (this.startTime + this.loadedFile.getFileDuration() - command.getTimestamp() < 0)  {
+            output.setMessage("Please load a source before using the shuffle function.");
+            this.shuffleState = false;
+            return output;
+        }
+        if (!this.loadedFile.getFileType().equals("playlist")) {
+            output.setMessage("The loaded source is not a playlist.");
+            return output;
+        }
+        if (this.shuffleState) {
+            Song currentSong = getSongFromPlaylist(command.getTimestamp());
+            int previousTimesSongs = ((Playlist) this.loadedFile).getPreviousSongsTime(currentSong, "songs");
+            int previousTimesShuffled = ((Playlist) this.loadedFile).getPreviousSongsTime(currentSong, "shuffled");
+            this.startTime = this.startTime + previousTimesShuffled - previousTimesSongs;
+//            this.startTime = command.getTimestamp() - previousTimes - (currentSong.getDuration() + previousTimes + this.startTime - command.getTimestamp());
+
+            ((Playlist) this.loadedFile).setMainSongs(((Playlist) this.loadedFile).getSongs());
+            this.shuffleState = false;
+            output.setMessage("Shuffle function deactivated successfully.");
+        } else {
+            ((Playlist) this.loadedFile).setShuffled(new ArrayList<>());
+            ((Playlist) this.loadedFile).generateShuffled(command.getSeed());
+            Song currentSong = getSongFromPlaylist(command.getTimestamp());
+//            int previousTimes = ((Playlist) this.loadedFile).getPreviousSongsTime(currentSong, "shuffled");
+//            this.startTime = command.getTimestamp() - previousTimes - (currentSong.getDuration() + previousTimes + this.startTime - command.getTimestamp());
+
+            int previousTimesSongs = ((Playlist) this.loadedFile).getPreviousSongsTime(currentSong, "songs");
+            int previousTimesShuffled = ((Playlist) this.loadedFile).getPreviousSongsTime(currentSong, "shuffled");
+            this.startTime = this.startTime + previousTimesSongs - previousTimesShuffled;
+
+            ((Playlist) this.loadedFile).setMainSongs(((Playlist) this.loadedFile).getShuffled());
+            this.shuffleState = true;
+            output.setMessage("Shuffle function activated successfully.");
+        }
+        return output;
+    }
+
     private CommandOutput status(CommandInput command) {
         CommandOutput output = new CommandOutput();
         if (this.loadedFile == null) {
@@ -178,8 +215,10 @@ public class MusicPlayer {
         String filename;
         filename = getStatusName(command);
         int remainedTime = calculateTimeStatus(command);
-        if (remainedTime <= 0)
+        if (remainedTime <= 0) {
+            this.loadedFile = null;
             filename = "";
+        }
         PlayerStatus stats = new PlayerStatus(filename, remainedTime, this.repeatState, this.shuffleState, !this.playState);
         output.setStats(stats);
         return output;
@@ -239,6 +278,18 @@ public class MusicPlayer {
         return remainedTime;
     }
 
+    private String getStatusName(CommandInput command) {
+        String filename;
+        if (loadedFile.getFileType().equals("song")) {
+            filename = this.loadedFile.getName();
+        } else if (loadedFile.getFileType().equals("playlist")) {
+            filename = getSongFromPlaylist(command.getTimestamp()).getName();
+        } else {
+            filename = getEpisodeFromPodcast(command.getTimestamp()).getName();
+        }
+        return filename;
+    }
+
     // TODO: move to corresponding class
     private int getEpisodeRemainedTime(int timestamp) {
         int podcastElapsed;
@@ -270,7 +321,7 @@ public class MusicPlayer {
         if (this.repeatState.equals("Repeat Current Song")) {
             return (timestamp - this.repeatStartTime) % repeatedSong.getDuration();
         }
-        for (Song song : ((Playlist)this.loadedFile).getSongs()) {
+        for (Song song : ((Playlist)this.loadedFile).getMainSongs()) {
             playlistElapsed -= song.getDuration();
             if (playlistElapsed < 0) {
                 playlistElapsed += song.getDuration();
@@ -278,18 +329,6 @@ public class MusicPlayer {
             }
         }
         return 0;
-    }
-
-    private String getStatusName(CommandInput command) {
-        String filename;
-        if (loadedFile.getFileType().equals("song")) {
-            filename = this.loadedFile.getName();
-        } else if (loadedFile.getFileType().equals("playlist")) {
-            filename = getSongFromPlaylist(command.getTimestamp()).getName();
-        } else {
-            filename = getEpisodeFromPodcast(command.getTimestamp()).getName();
-        }
-        return filename;
     }
 
     // TODO: move to corresponding class
@@ -327,7 +366,7 @@ public class MusicPlayer {
         }
         else
             playlistElapsed = this.elapsedTime;
-        for (Song song : ((Playlist)this.loadedFile).getSongs()) {
+        for (Song song : ((Playlist)this.loadedFile).getMainSongs()) {
             playlistElapsed -= song.getDuration();
             if (playlistElapsed < 0)
                 return song;
