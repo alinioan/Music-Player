@@ -1,8 +1,8 @@
-package playerFiles;
+package playerfiles;
 
 import lombok.Getter;
 import lombok.Setter;
-import musicPlayer.User;
+import musicplayer.User;
 
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package playerFiles;
+package playerfiles;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,10 +8,19 @@ import lombok.Setter;
 public class AudioFile {
     private String name;
     private String fileType;
+
+    /**
+     *
+     * @return
+     */
     public int getFileDuration() {
         return 0;
     }
 
+    /**
+     *
+     * @return
+     */
     public AudioFile deepCopy() {
         AudioFile copy = new AudioFile();
         copy.name = getName();

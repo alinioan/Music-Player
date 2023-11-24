@@ -1,12 +1,12 @@
-package musicPlayer;
+package musicplayer;
 
 import checker.CheckerConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import commandIO.CommandInput;
-import commandIO.CommandOutput;
-import playerFiles.Library;
+import commandio.CommandInput;
+import commandio.CommandOutput;
+import playerfiles.Library;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,28 +14,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-/*
-* TODO: Could make this simpleton maybe, idk check later
-*
- */
 public class UserManager {
-    static final String LIBRARY_PATH = CheckerConstants.TESTS_PATH + "library/library.json";
-    Library library;
-    HashMap<String, User> users = new HashMap<>();
-    ArrayList<CommandInput> input;
-    static int commandId = 0;
-    ArrayList<CommandOutput> outputs = new ArrayList<>();
+    private static final String LIBRARY_PATH = CheckerConstants.TESTS_PATH + "library/library.json";
+    private Library library;
+    private final HashMap<String, User> users = new HashMap<>();
+    private ArrayList<CommandInput> input;
+    private final ArrayList<CommandOutput> outputs = new ArrayList<>();
 
-    public ArrayNode start(String filePathInput) throws IOException{
+    /**
+     * the start point of the implementation
+     * @param filePathInput command input file
+     * @return array of outputs
+     * @throws IOException
+     */
+    public ArrayNode start(final String filePathInput) throws IOException {
         readInput(filePathInput);
-        if (filePathInput.contains("01") || filePathInput.contains("02") || filePathInput.contains("03") || filePathInput.contains("04") ||
-            filePathInput.contains("05") || filePathInput.contains("06") || filePathInput.contains("07") || filePathInput.contains("08") ||
-            filePathInput.contains("09") || filePathInput.contains("10") || filePathInput.contains("11") || filePathInput.contains("12"))
-            processCommands();
+        processCommands();
         return outputResult();
     }
 
-    void readInput(String filePathInput) throws IOException {
+    /**
+     * read the commands from file and put them in the input data field of this object
+     * @param filePathInput input file
+     * @throws IOException
+     */
+    private void readInput(final String filePathInput) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         // read library
         this.library = objectMapper.readValue(new File(LIBRARY_PATH), Library.class);
@@ -44,33 +47,42 @@ public class UserManager {
             users.put(usr.getUsername(), usr);
         }
         // read command
-        CommandInput[] commandArray = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH + filePathInput), CommandInput[].class);
+        CommandInput[] commandArray = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
+                                                         + filePathInput), CommandInput[].class);
         this.input = new ArrayList<>(Arrays.asList(commandArray));
     }
 
-    void processCommands() {
+    /**
+     * call the specific methods to process the commands
+     */
+    private void processCommands() {
         for (CommandInput command : this.input) {
             User user = users.get(command.getUsername());
+            if (user == null) {
+                continue;
+            }
             CommandOutput crtOutput = user.getPlayer().processCommand(command, library);
-            if (crtOutput == null)
+            if (crtOutput == null) {
                 crtOutput = user.processCommand(command, library);
-            if (crtOutput == null)
-                continue; // TODO: temporary until all commands are implemented
+            }
+            if (crtOutput == null) {
+                continue;
+            }
             crtOutput.setUser(user.getUsername());
             crtOutput.setCommand(command.getCommand());
             crtOutput.setTimestamp(command.getTimestamp());
             this.outputs.add(crtOutput);
-//            switch (command.getCommand()) {
-//                case "getTop5Songs":
-//                    break;
-//                case "getTop5Playlists":
-//                    break;
-//            }
         }
     }
-    ArrayNode outputResult() {
-        if (this.outputs == null || this.outputs.isEmpty())
+
+    /**
+     * create the output array
+     * @return an arrya made of output objects
+     */
+    private ArrayNode outputResult() {
+        if (this.outputs.isEmpty()) {
             return null;
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode outputNode = objectMapper.createArrayNode();
         for (CommandOutput output : this.outputs) {
@@ -97,7 +109,8 @@ public class UserManager {
                 statsObject.put("paused", output.getStats().isPaused());
                 outputObject.put("stats", statsObject);
             }
-            if (output.getShowPlaylistOutput() != null && !output.getShowPlaylistOutput().isEmpty()) {
+            if (output.getShowPlaylistOutput() != null
+                    && !output.getShowPlaylistOutput().isEmpty()) {
                 ArrayNode playlistsNode = objectMapper.valueToTree(output.getShowPlaylistOutput());
                 outputObject.put("result", playlistsNode);
             }

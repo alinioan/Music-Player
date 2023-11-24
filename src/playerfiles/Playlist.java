@@ -1,4 +1,4 @@
-package playerFiles;
+package playerfiles;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,11 +17,22 @@ public class Playlist extends AudioFile {
     private ArrayList<Song> mainSongs;
     private ArrayList<Song> songs;
     private ArrayList<Song> shuffled = new ArrayList<>();
-    int followers = 0;
+    private int followers = 0;
 
-    public  Playlist() {}
+    public  Playlist() {
 
-    public Playlist(String name, String visibility, String owner, int id, ArrayList<Song> songs) {
+    }
+
+    /**
+     * constructor
+     * @param name
+     * @param visibility
+     * @param owner
+     * @param id
+     * @param songs
+     */
+    public Playlist(final String name, final String visibility, final String owner,
+                    final int id, final ArrayList<Song> songs) {
         this.name = name;
         this.visibility = visibility;
         this.owner = owner;
@@ -30,33 +41,49 @@ public class Playlist extends AudioFile {
         this.mainSongs = songs;
     }
 
-    public int getPreviousSongsTime(Song currentSong, String list) {
-        ArrayList<Song> songs = this.getMainSongs();
+    /**
+     * get all the duration of all the songs before the one given
+     * @param currentSong song in the playlist
+     * @param list in which ArrayList should this duration be calculated.
+     *             Default looks in the main array
+     * @return duration
+     */
+    public int getPreviousSongsTime(final Song currentSong, final String list) {
+        ArrayList<Song> crtSongs = this.getMainSongs();
         switch (list) {
             case "songs":
-                songs = this.getSongs();
+                crtSongs = this.getSongs();
                 break;
             case "shuffled":
-                songs = this.getShuffled();
+                crtSongs = this.getShuffled();
                 break;
             default:
                 break;
         }
         int previousSongsTime = 0;
-        for (Song song : songs) {
-            if (song.equals(currentSong))
+        for (Song song : crtSongs) {
+            if (song.equals(currentSong)) {
                 return previousSongsTime;
+            }
             previousSongsTime += song.getDuration();
         }
         return previousSongsTime;
     }
 
-    public void generateShuffled(int seed) {
+    /**
+     * generate shuffled list
+     * @param seed seed for random numbers
+     */
+    public void generateShuffled(final int seed) {
         Random rand = new Random(seed);
         this.shuffled.addAll(this.songs);
         Collections.shuffle(this.shuffled, rand);
     }
 
+    /**
+     * Deep copy of the AudioFile object
+     * @return the deep copy
+     */
     @Override
     public AudioFile deepCopy() {
         AudioFile file = super.deepCopy();
@@ -73,6 +100,10 @@ public class Playlist extends AudioFile {
         return copy;
     }
 
+    /**
+     * Get duration of playlist
+     * @return playlist duration
+     */
     @Override
     public int getFileDuration() {
         int duration = 0;
@@ -82,14 +113,18 @@ public class Playlist extends AudioFile {
         return duration;
     }
 
+    /**
+     * To string method
+     * @return the object as a string
+     */
     @Override
     public String toString() {
-        return "Playlist{" +
-                "name='" + name + '\'' +
-                ", visibility='" + visibility + '\'' +
-                ", owner='" + owner + '\'' +
-                ", id=" + id +
-                ", songs=" + songs +
-                '}';
+        return "Playlist{"
+                + "name='" + name + '\''
+                + ", visibility='" + visibility + '\''
+                + ", owner='" + owner + '\''
+                + ", id=" + id
+                + ", songs=" + songs
+                + '}';
     }
 }
