@@ -1,8 +1,11 @@
 package app;
 
+import app.audio.Collections.Album;
+import app.audio.Collections.AlbumOutput;
 import app.audio.Collections.PlaylistOutput;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
+import app.user.Artist;
 import app.user.User;
 import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +37,7 @@ public final class CommandRunner {
     public static ObjectNode search(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
+            objectNode.put("results",  objectMapper.valueToTree(new ArrayList<>()));
             return objectNode;
         }
         User user = Admin.getUser(commandInput.getUsername());
@@ -529,18 +533,43 @@ public final class CommandRunner {
      * @return the object node.
      */
     public static ObjectNode addUser(final CommandInput commandInput) {
-        User newUser = new User(commandInput.getUsername(), commandInput.getAge(),
+        String message = Admin.addUser(commandInput.getUsername(), commandInput.getAge(),
                                 commandInput.getCity(), Enums.getTypeFromString(commandInput.getType()));
-        String message = Admin.addUser(newUser);
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
-        objectNode.put("user", newUser.getUsername());
+        objectNode.put("user", commandInput.getUsername());
         objectNode.put("message", message);
         return objectNode;
     }
 
+    public static ObjectNode addAlbum(CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        //TODO: check if user is valid
+        String message = Admin.addAlbum(user, commandInput.getName(), commandInput.getReleaseYear(),
+                                        commandInput.getDescription(), commandInput.getSongs());
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode showAlbums(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ArrayList<AlbumOutput> albumOutputs = ((Artist) user).showAlbums();
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(albumOutputs));
+
+        return objectNode;
+    }
 
     /**
      * Check if the user from the command exists.
@@ -574,8 +603,6 @@ public final class CommandRunner {
             objectNode.put("command", commandInput.getCommand());
             objectNode.put("user", commandInput.getUsername());
             objectNode.put("timestamp", commandInput.getTimestamp());
-            // TODO: this might not work
-            objectNode.put("results",  objectMapper.valueToTree(new ArrayList<>()));
             objectNode.put("message", user.getUsername() + " is offline.");
             return objectNode;
         }

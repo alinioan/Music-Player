@@ -1,8 +1,6 @@
 package app.user;
 
-import app.audio.Collections.AudioCollection;
-import app.audio.Collections.Playlist;
-import app.audio.Collections.PlaylistOutput;
+import app.audio.Collections.*;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
@@ -36,6 +34,13 @@ public class User {
     private final SearchBar searchBar;
     private boolean lastSearched;
     private boolean connectionStatus;
+    /**
+     * -- GETTER --
+     *  Retrieves the user type.
+     *
+     * @return The user type as an instance of Enums.UserType.
+     */
+    @Getter
     private Enums.UserType userType;
 
     /**
@@ -57,28 +62,6 @@ public class User {
         lastSearched = false;
         this.connectionStatus = true;
         this.userType = Enums.UserType.NORMAL;
-    }
-
-    /**
-     * Instantiates a new User with a specific type.
-     *
-     * @param username the username
-     * @param age      the age
-     * @param city     the city
-     * @param userType the type
-     */
-    public User(final String username, final int age, final String city, Enums.UserType userType) {
-        this.username = username;
-        this.age = age;
-        this.city = city;
-        playlists = new ArrayList<>();
-        likedSongs = new ArrayList<>();
-        followedPlaylists = new ArrayList<>();
-        player = new Player();
-        searchBar = new SearchBar(username);
-        lastSearched = false;
-        this.connectionStatus = true;
-        this.userType = userType;
     }
 
     /**
@@ -530,5 +513,14 @@ public class User {
         connectionStatus = !connectionStatus;
         player.setConnectionStatus(connectionStatus);
         return username + " has changed status successfully.";
+    }
+
+    /**
+     * Sets the user type.
+     *
+     * @param userType The Enums.UserType to be set as the user type.
+     */
+    public void setUserType(Enums.UserType userType) {
+        this.userType = userType;
     }
 }

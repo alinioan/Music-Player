@@ -1,10 +1,14 @@
 package app;
 
+import app.audio.Collections.Album;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.Podcast;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
+import app.user.Artist;
+import app.user.Host;
 import app.user.User;
+import app.utils.Enums;
 import fileio.input.EpisodeInput;
 import fileio.input.PodcastInput;
 import fileio.input.SongInput;
@@ -195,15 +199,47 @@ public final class Admin {
     /**
      * Add a new user.
      *
-     * @param user the user.
-     * @return the output message.
+     * @param name the username.
+     * @param age the age.
+     * @param city the city.
+     * @param type the type fo the user.
+     * @return output message.
      */
-    public static String addUser(User user) {
-        if (!users.contains(user)) {
-            return "The username " + user.getUsername() + " is already taken.";
+    public static String addUser(final String name, final Integer age, final String city, final Enums.UserType type) {
+        User newUser = null;
+        switch (type) {
+            case NORMAL -> newUser = new User(name, age, city);
+            case ARTIST -> newUser = new Artist(name, age, city);
+            case HOST -> newUser = new Host(name, age, city);
         }
-        users.add(user);
-        return "The username " + user.getUsername() + " has been added successfully.";
+        for (User user : users) {
+            if (user.getUsername().equals(newUser.getUsername())) {
+                return "The username " + user.getUsername() + " is already taken.";
+            }
+        }
+        users.add(newUser);
+        return "The username " + newUser.getUsername() + " has been added successfully.";
+    }
+
+    public static String addAlbum(final User user, final String name, final Integer releaseYear,
+                                  final String description, final ArrayList<SongInput> songInputs) {
+        if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
+            return user.getUsername() + " is not an artist.";
+        }
+
+        ArrayList<Song> albumSongs = new ArrayList<>();
+        for (SongInput songInput : songInputs) {
+            for (Song songCheck : albumSongs) {
+                if (songCheck.getName().equals(songInput.getName())) {
+                    return user.getUsername() + " has the same song at least twice in this album.";
+                }
+            }
+            albumSongs.add(new Song(songInput.getName(), songInput.getDuration(), songInput.getAlbum(),
+                           songInput.getTags(), songInput.getLyrics(), songInput.getGenre(),
+                           songInput.getReleaseYear(), songInput.getArtist()));
+        }
+        songs.addAll(albumSongs);
+        return ((Artist) user).addAlbum(name, releaseYear, description, albumSongs);
     }
 
     /**

@@ -1,6 +1,9 @@
 package fileio.input;
 
+import app.audio.Files.Song;
 import lombok.Getter;
+
+import java.util.ArrayList;
 
 @Getter
 public final class CommandInput {
@@ -19,6 +22,7 @@ public final class CommandInput {
     private String name;
     private Integer releaseYear;
     private String description;
+    private ArrayList<SongInput> songs;
 
     public CommandInput() {
     }
@@ -61,6 +65,30 @@ public final class CommandInput {
 
     public void setSeed(final Integer seed) {
         this.seed = seed;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setReleaseYear(Integer releaseYear) {
+        this.releaseYear = releaseYear;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setSongs(ArrayList<SongInput> songs) {
+        this.songs = songs;
     }
 
     @Override
