@@ -20,6 +20,7 @@ public final class Player {
     @Getter
     private String type;
     private final int skipTime = 90;
+    private boolean connectionStatus;
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
@@ -30,6 +31,7 @@ public final class Player {
     public Player() {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.paused = true;
+        this.connectionStatus = true;
     }
 
     /**
@@ -166,7 +168,7 @@ public final class Player {
      */
     public void simulatePlayer(final int time) {
         int elapsedTime = time;
-        if (!paused) {
+        if (!paused && connectionStatus) {
             while (elapsedTime >= source.getDuration()) {
                 elapsedTime -= source.getDuration();
                 next();
@@ -253,6 +255,24 @@ public final class Player {
      */
     public boolean getShuffle() {
         return shuffle;
+    }
+
+    /**
+     * Retrieves the current connection status.
+     *
+     * @return The current connection status as a boolean.
+     */
+    public boolean getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    /**
+     * Sets the connection status.
+     *
+     * @param connectionStatus The boolean value representing the connection status to be set.
+     */
+    public void setConnectionStatus(boolean connectionStatus) {
+        this.connectionStatus = connectionStatus;
     }
 
     /**

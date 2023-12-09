@@ -35,9 +35,11 @@ public class User {
     private final Player player;
     private final SearchBar searchBar;
     private boolean lastSearched;
+    private boolean connectionStatus;
+    private Enums.UserType userType;
 
     /**
-     * Instantiates a new User.
+     * Instantiates a new normal User.
      *
      * @param username the username
      * @param age      the age
@@ -53,6 +55,30 @@ public class User {
         player = new Player();
         searchBar = new SearchBar(username);
         lastSearched = false;
+        this.connectionStatus = true;
+        this.userType = Enums.UserType.NORMAL;
+    }
+
+    /**
+     * Instantiates a new User with a specific type.
+     *
+     * @param username the username
+     * @param age      the age
+     * @param city     the city
+     * @param userType the type
+     */
+    public User(final String username, final int age, final String city, Enums.UserType userType) {
+        this.username = username;
+        this.age = age;
+        this.city = city;
+        playlists = new ArrayList<>();
+        likedSongs = new ArrayList<>();
+        followedPlaylists = new ArrayList<>();
+        player = new Player();
+        searchBar = new SearchBar(username);
+        lastSearched = false;
+        this.connectionStatus = true;
+        this.userType = userType;
     }
 
     /**
@@ -479,5 +505,30 @@ public class User {
      */
     public void simulateTime(final int time) {
         player.simulatePlayer(time);
+    }
+
+    /**
+     * Get connection status.
+     * true - user is online.
+     * false - user is offline.
+     *
+     * @return the connection Status
+     */
+    public boolean isOnline() {
+        return connectionStatus;
+    }
+
+    /**
+     * Switch the connection status.
+     *
+     * @return the output message.
+     */
+    public String switchConnectionStatus() {
+        if (userType != Enums.UserType.NORMAL) {
+            return username + " is not a normal user";
+        }
+        connectionStatus = !connectionStatus;
+        player.setConnectionStatus(connectionStatus);
+        return username + " has changed status successfully.";
     }
 }

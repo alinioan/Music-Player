@@ -178,6 +178,35 @@ public final class Admin {
     }
 
     /**
+     * Get online users.
+     *
+     * @return the users.
+     */
+    public static List<String> getOnlineUsers() {
+        List<String> onlineUsers = new ArrayList<>();
+        for (User user : users) {
+            if (user.isOnline()) {
+                onlineUsers.add(user.getUsername());
+            }
+        }
+        return onlineUsers;
+    }
+
+    /**
+     * Add a new user.
+     *
+     * @param user the user.
+     * @return the output message.
+     */
+    public static String addUser(User user) {
+        if (!users.contains(user)) {
+            return "The username " + user.getUsername() + " is already taken.";
+        }
+        users.add(user);
+        return "The username " + user.getUsername() + " has been added successfully.";
+    }
+
+    /**
      * Reset.
      */
     public static void reset() {
