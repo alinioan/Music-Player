@@ -1,8 +1,9 @@
-package app.user;
+package app.user.host;
 
+import app.user.User;
 import app.utils.Enums;
 
-public class Host extends User{
+public class Host extends User {
     /**
      * Instantiates a new User.
      *

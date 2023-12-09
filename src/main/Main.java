@@ -73,7 +73,7 @@ public final class Main {
         LibraryInput library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                + "library/library.json"),
                                                                LibraryInput.class);
-        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02"))
+        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02") && !filePath1.contains("03"))
             return;
         CommandInput[] commands = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                   + filePath1),
@@ -117,6 +117,8 @@ public final class Main {
                 case "addUser" -> outputs.add(CommandRunner.addUser(command));
                 case "addAlbum" -> outputs.add(CommandRunner.addAlbum(command));
                 case "showAlbums" -> outputs.add(CommandRunner.showAlbums(command));
+                case "addEvent" -> outputs.add(CommandRunner.addEvent(command));
+                case "addMerch" -> outputs.add(CommandRunner.addmerch(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

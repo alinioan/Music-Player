@@ -10,6 +10,7 @@ import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class User {
     private final Player player;
     private final SearchBar searchBar;
     private boolean lastSearched;
+    @Setter
     private boolean connectionStatus;
     /**
      * -- GETTER --

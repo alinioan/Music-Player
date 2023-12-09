@@ -23,6 +23,8 @@ public final class CommandInput {
     private Integer releaseYear;
     private String description;
     private ArrayList<SongInput> songs;
+    private String date;
+    private Integer price;
 
     public CommandInput() {
     }

@@ -1,12 +1,11 @@
 package app;
 
-import app.audio.Collections.Album;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.Podcast;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
-import app.user.Artist;
-import app.user.Host;
+import app.user.artist.Artist;
+import app.user.host.Host;
 import app.user.User;
 import app.utils.Enums;
 import fileio.input.EpisodeInput;

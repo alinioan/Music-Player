@@ -1,17 +1,15 @@
 package app;
 
-import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Collections.PlaylistOutput;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
-import app.user.Artist;
+import app.user.artist.Artist;
 import app.user.User;
 import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.input.CommandInput;
-import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -567,6 +565,48 @@ public final class CommandRunner {
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("result", objectMapper.valueToTree(albumOutputs));
+
+        return objectNode;
+    }
+
+    public static ObjectNode addEvent(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+
+        if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
+            objectNode.put("message", commandInput.getUsername() + " is not an artist.");
+            return objectNode;
+        }
+        String message = ((Artist) user).addEvent(commandInput.getName(), commandInput.getDescription(), commandInput.getDate());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
+    public static ObjectNode addmerch(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+
+        if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
+            objectNode.put("message", commandInput.getUsername() + " is not an artist.");
+            return objectNode;
+        }
+        String message = ((Artist) user).addMerch(commandInput.getName(), commandInput.getDescription(), commandInput.getPrice());
+        objectNode.put("message", message);
 
         return objectNode;
     }
