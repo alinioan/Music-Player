@@ -590,7 +590,7 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode addmerch(final CommandInput commandInput) {
+    public static ObjectNode addMerch(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
         ObjectNode objectNode = checkUserNull(commandInput);
@@ -607,6 +607,17 @@ public final class CommandRunner {
         }
         String message = ((Artist) user).addMerch(commandInput.getName(), commandInput.getDescription(), commandInput.getPrice());
         objectNode.put("message", message);
+
+        return objectNode;
+    }
+
+    public static ObjectNode getAllUsers(CommandInput commandInput) {
+        List<String> allUser = Admin.getAllUsers();
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(allUser));
 
         return objectNode;
     }

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * The type User.
  */
-public class User {
+public class User implements Comparable<User> {
     @Getter
     private String username;
     @Getter
@@ -524,5 +524,10 @@ public class User {
      */
     public void setUserType(Enums.UserType userType) {
         this.userType = userType;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return userType.compareTo(o.getUserType());
     }
 }

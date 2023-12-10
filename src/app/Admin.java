@@ -14,6 +14,7 @@ import fileio.input.SongInput;
 import fileio.input.UserInput;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -193,6 +194,15 @@ public final class Admin {
             }
         }
         return onlineUsers;
+    }
+
+    public static List<String> getAllUsers() {
+        Collections.sort(users);
+        List<String> allUsers = new ArrayList<>();
+        for (User user : users) {
+            allUsers.add(user.getUsername());
+        }
+        return allUsers;
     }
 
     /**
