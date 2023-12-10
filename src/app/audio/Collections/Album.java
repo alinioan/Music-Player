@@ -14,4 +14,9 @@ public class Album extends Playlist {
         this.releaseYear = releaseYear;
         super.setSongs(songs);
     }
+
+    @Override
+    public boolean matchesDescription(String description) {
+        return this.description.toLowerCase().startsWith(description);
+    }
 }

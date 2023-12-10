@@ -1,6 +1,8 @@
 package app.searchBar;
 
 import app.audio.LibraryEntry;
+import app.user.User;
+import app.utils.Enums;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,12 +141,28 @@ public final class FilterUtils {
         return filter(entries, entry -> entry.matchesFollowers(followers));
     }
 
+    public static List<LibraryEntry> filterByDescription(final List<LibraryEntry> entries,
+                                                         final String description) {
+        return filter(entries, entry -> entry.matchesDescription(description));
+    }
+
     private static List<LibraryEntry> filter(final List<LibraryEntry> entries,
                                              final FilterCriteria criteria) {
         List<LibraryEntry> result = new ArrayList<>();
         for (LibraryEntry entry : entries) {
             if (criteria.matches(entry)) {
                 result.add(entry);
+            }
+        }
+        return result;
+    }
+
+    public static List<User> filterUserByName(final List<User> entries,
+                                              final String name, final Enums.UserType type) {
+        List<User> result = new ArrayList<>();
+        for (User user : entries) {
+            if (user.getUsername().toLowerCase().startsWith(name) && user.getUserType().equals(type)) {
+                result.add(user);
             }
         }
         return result;

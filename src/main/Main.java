@@ -121,6 +121,7 @@ public final class Main {
                 case "addEvent" -> outputs.add(CommandRunner.addEvent(command));
                 case "addMerch" -> outputs.add(CommandRunner.addMerch(command));
                 case "getAllUsers" -> outputs.add(CommandRunner.getAllUsers(command));
+                case "printCurrentPage" -> outputs.add(CommandRunner.printCurrentPage(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

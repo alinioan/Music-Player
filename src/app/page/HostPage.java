@@ -1,4 +1,4 @@
 package app.page;
 
-public class HostPage extends Page{
+public class HostPage {
 }

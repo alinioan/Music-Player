@@ -9,8 +9,8 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 
+@Getter
 public class Artist extends User {
-    @Getter
     private ArrayList<Album> albums;
     private ArrayList<Event> events;
     private ArrayList<Merch> merches;
@@ -26,6 +26,7 @@ public class Artist extends User {
         super(username, age, city);
         super.setUserType(Enums.UserType.ARTIST);
         super.setConnectionStatus(false);
+        super.setCurrentPage("");
         albums = new ArrayList<>();
         events = new ArrayList<>();
         merches = new ArrayList<>();

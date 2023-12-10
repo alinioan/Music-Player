@@ -1,9 +1,11 @@
 package app;
 
+import app.audio.Collections.Album;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.Podcast;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
+import app.page.PageManager;
 import app.user.artist.Artist;
 import app.user.host.Host;
 import app.user.User;
@@ -12,6 +14,7 @@ import fileio.input.EpisodeInput;
 import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +25,7 @@ import java.util.List;
  * The type Admin.
  */
 public final class Admin {
+    @Getter
     private static List<User> users = new ArrayList<>();
     private static List<Song> songs = new ArrayList<>();
     private static List<Podcast> podcasts = new ArrayList<>();
@@ -56,7 +60,6 @@ public final class Admin {
                     songInput.getReleaseYear(), songInput.getArtist()));
         }
     }
-
 
     /**
      * Sets podcasts.
@@ -107,6 +110,16 @@ public final class Admin {
         return playlists;
     }
 
+    public static List<Album> getAlbums() {
+        List<Album> albums = new ArrayList<>();
+        for (User user : users) {
+            if (user.getUserType().equals(Enums.UserType.ARTIST)) {
+                albums.addAll(((Artist) user).getAlbums());
+            }
+        }
+        return albums;
+    }
+
     /**
      * Gets user.
      *
@@ -136,6 +149,7 @@ public final class Admin {
 
         for (User user : users) {
             user.simulateTime(elapsed);
+            PageManager.updatePages(user);
         }
     }
 
@@ -258,6 +272,7 @@ public final class Admin {
         users = new ArrayList<>();
         songs = new ArrayList<>();
         podcasts = new ArrayList<>();
+        PageManager.reset();
         timestamp = 0;
     }
 }

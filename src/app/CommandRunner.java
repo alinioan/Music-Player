@@ -2,6 +2,7 @@ package app;
 
 import app.audio.Collections.AlbumOutput;
 import app.audio.Collections.PlaylistOutput;
+import app.page.PageManager;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.user.artist.Artist;
@@ -672,6 +673,21 @@ public final class CommandRunner {
             return objectNode;
         }
         objectNode = checkUserOffline(commandInput);
+        return objectNode;
+    }
+
+    public static ObjectNode printCurrentPage(CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        String message = PageManager.printCurrentPage(user);
+
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
         return objectNode;
     }
 }

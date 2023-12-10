@@ -12,6 +12,7 @@ import app.utils.Enums;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,14 +37,14 @@ public class User implements Comparable<User> {
     private boolean lastSearched;
     @Setter
     private boolean connectionStatus;
-    /**
-     * -- GETTER --
-     *  Retrieves the user type.
-     *
-     * @return The user type as an instance of Enums.UserType.
-     */
+    @Getter
+    private String slectedCreator;
+    @Getter
+    private Enums.UserType creatorType;
     @Getter
     private Enums.UserType userType;
+    @Getter @Setter
+    private String currentPage;
 
     /**
      * Instantiates a new normal User.
@@ -64,6 +65,7 @@ public class User implements Comparable<User> {
         lastSearched = false;
         this.connectionStatus = true;
         this.userType = Enums.UserType.NORMAL;
+        this.currentPage = "home";
     }
 
     /**
@@ -79,10 +81,16 @@ public class User implements Comparable<User> {
 
         lastSearched = true;
         ArrayList<String> results = new ArrayList<>();
-        List<LibraryEntry> libraryEntries = searchBar.search(filters, type);
-
-        for (LibraryEntry libraryEntry : libraryEntries) {
-            results.add(libraryEntry.getName());
+        if (!type.equals("artist") && !type.equals("host")) {
+            List<LibraryEntry> libraryEntries = searchBar.searchLibrary(filters, type);
+            for (LibraryEntry libraryEntry : libraryEntries) {
+                results.add(libraryEntry.getName());
+            }
+            return results;
+        }
+        List<User> userEntries = searchBar.searchUsers(filters, type);
+        for (User user : userEntries) {
+            results.add(user.getUsername());
         }
         return results;
     }
@@ -100,13 +108,23 @@ public class User implements Comparable<User> {
 
         lastSearched = false;
 
-        LibraryEntry selected = searchBar.select(itemNumber);
+        if (!searchBar.getLastSearchType().equals("artist") && !searchBar.getLastSearchType().equals("host")) {
+            LibraryEntry selected = searchBar.select(itemNumber);
+
+            if (selected == null) {
+                return "The selected ID is too high.";
+            }
+
+            return "Successfully selected %s.".formatted(selected.getName());
+        }
+        User selected = searchBar.selectUser(itemNumber);
 
         if (selected == null) {
             return "The selected ID is too high.";
         }
-
-        return "Successfully selected %s.".formatted(selected.getName());
+        this.creatorType = selected.getUserType();
+        this.slectedCreator = selected.getUsername();
+        return "Successfully selected " + this.slectedCreator + "'s page.";
     }
 
     /**
