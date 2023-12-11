@@ -130,7 +130,7 @@ public final class SearchBar {
                 }
 
                 break;
-            case "Album":
+            case "album":
                 entries = new ArrayList<>(Admin.getAlbums());
 
                 if (filters.getName() != null) {

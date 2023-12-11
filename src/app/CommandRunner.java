@@ -543,6 +543,17 @@ public final class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode deleteUser(final CommandInput commandInput) {
+        String message = Admin.deleteUser(commandInput.getUsername());
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
     public static ObjectNode addAlbum(CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         //TODO: check if user is valid

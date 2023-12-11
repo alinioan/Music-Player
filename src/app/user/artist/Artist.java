@@ -38,6 +38,7 @@ public class Artist extends User {
         if (checkAlbumExists(album.getName())) {
             return this.getUsername() + " has another album with the same name.";
         }
+        super.getPlaylists().add(album);
         this.albums.add(album);
         return this.getUsername() + " has added new album successfully.";
     }

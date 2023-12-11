@@ -244,6 +244,85 @@ public final class Admin {
         return "The username " + newUser.getUsername() + " has been added successfully.";
     }
 
+    public static String deleteUser(final String username) {
+        User deleteUser = Admin.getUser(username);
+
+        for (User user : users) {
+            if (user.getUserType().equals(Enums.UserType.NORMAL)) {
+                if (user.getSlectedCreator() != null && user.getSlectedCreator().equals(username)) {
+                    return username + " can't be deleted.";
+                }
+                if (!checkArtistAlbumsDelete(user, deleteUser)) {
+                    return username + " can't be deleted.";
+                }
+            }
+        }
+        if (deleteUser.getUserType().equals(Enums.UserType.ARTIST)) {
+            deleteSongsArtist((Artist) deleteUser);
+        }
+        users.remove(deleteUser);
+        return username + " was successfully deleted.";
+    }
+
+    private static boolean checkArtistAlbumsDelete(User crtUser, User artist) {
+        String sourceCollectionName = null;
+        String sourceFileName = null;
+
+        if (crtUser.getPlayer().getSource() != null) {
+            if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
+                sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+            }
+            if (crtUser.getPlayer().getSource().getAudioFile() != null) {
+                sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
+            }
+        }
+
+        if (!artist.getUserType().equals(Enums.UserType.ARTIST)) {
+            return true;
+        }
+
+        for (Album album : ((Artist) artist).getAlbums()) {
+            if (album.getName().equals(sourceCollectionName)) {
+                return false;
+            }
+
+            for (Song songAlbum : album.getSongs()) {
+                if (songAlbum.getName().equals(sourceFileName)) {
+                    return false;
+                }
+
+                for (Playlist playlist : crtUser.getPlaylists()) {
+                    for (Song songPlaylist : playlist.getSongs()) {
+                        if (songAlbum.getName().equals(songPlaylist.getName())) {
+                            return false;
+                        }
+                    }
+                }
+
+//                for (Song likedSong : crtUser.getLikedSongs()) {
+//                    if (songAlbum.getName().equals(likedSong.getName())) {
+//                        return false;
+//                    }
+//                }
+            }
+        }
+        return true;
+    }
+
+    private static void deleteSongsArtist(Artist artist) {
+        for (Album album : artist.getAlbums()) {
+            for (Song songAlbum : album.getSongs()) {
+                songs.removeIf(song -> songAlbum.getName().equals(song.getName()));
+                for (User user : users) {
+                    for (Playlist playlist : user.getPlaylists()) {
+//                        playlist.getSongs().removeIf(song -> songAlbum.getName().equals(song.getName()));
+                    }
+                    user.getLikedSongs().removeIf(song -> songAlbum.getName().equals(song.getName()));
+                }
+            }
+        }
+    }
+
     public static String addAlbum(final User user, final String name, final Integer releaseYear,
                                   final String description, final ArrayList<SongInput> songInputs) {
         if (!user.getUserType().equals(Enums.UserType.ARTIST)) {

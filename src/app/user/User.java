@@ -32,6 +32,7 @@ public class User implements Comparable<User> {
     private ArrayList<Song> likedSongs;
     @Getter
     private ArrayList<Playlist> followedPlaylists;
+    @Getter
     private final Player player;
     private final SearchBar searchBar;
     private boolean lastSearched;
@@ -114,7 +115,7 @@ public class User implements Comparable<User> {
             if (selected == null) {
                 return "The selected ID is too high.";
             }
-
+            System.out.println(selected.getName());
             return "Successfully selected %s.".formatted(selected.getName());
         }
         User selected = searchBar.selectUser(itemNumber);

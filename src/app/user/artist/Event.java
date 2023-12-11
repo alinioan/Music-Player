@@ -25,7 +25,6 @@ public class Event {
             int day = Integer.parseInt(dateTokens.nextToken());
             int month = Integer.parseInt(dateTokens.nextToken());
             int year = Integer.parseInt(dateTokens.nextToken());
-            System.out.println(day + month + year);
             return isValidDay(day, month, year) && isValidMonth(month) && isValidYear(year);
         }
         return false;
