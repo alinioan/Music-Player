@@ -218,7 +218,7 @@ public class User implements Comparable<User> {
         }
 
         if (!player.getType().equals("playlist") && !player.getType().equals("album")) {
-            return "The loaded source is not a playlist.";
+            return "The loaded source is not a playlist or an album.";
         }
 
         player.shuffle(seed);

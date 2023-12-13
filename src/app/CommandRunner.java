@@ -13,6 +13,7 @@ import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.input.CommandInput;
+import org.checkerframework.checker.units.qual.C;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
@@ -490,6 +491,17 @@ public final class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode getTop5Albums(final CommandInput commandInput) {
+        List<String> playlists = Admin.getTop5Albums();
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(playlists));
+
+        return objectNode;
+    }
+
     /**
      * Switch the connection status.
      *
@@ -671,6 +683,21 @@ public final class CommandRunner {
         }
         User user = Admin.getUser(commandInput.getUsername());
         String message = Admin.addPodcast(user, commandInput.getName(), commandInput.getEpisodes());
+
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode removePodcast(final CommandInput commandInput) {
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        User user = Admin.getUser(commandInput.getUsername());
+        String message = Admin.removePodcast(user, commandInput.getName());
 
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());

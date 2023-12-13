@@ -16,10 +16,7 @@ import fileio.input.SongInput;
 import fileio.input.UserInput;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * The type Admin.
@@ -105,7 +102,9 @@ public final class Admin {
     public static List<Playlist> getPlaylists() {
         List<Playlist> playlists = new ArrayList<>();
         for (User user : users) {
-            playlists.addAll(user.getPlaylists());
+            if (user.getUserType().equals(Enums.UserType.NORMAL)) {
+                playlists.addAll(user.getPlaylists());
+            }
         }
         return playlists;
     }
@@ -196,6 +195,23 @@ public final class Admin {
             count++;
         }
         return topPlaylists;
+    }
+
+    public static List<String> getTop5Albums() {
+        List<Playlist> sortedAlbums = new ArrayList<>(getAlbums());
+        sortedAlbums.sort(Comparator.comparingInt(Playlist::getFollowers)
+                .reversed()
+                .thenComparing(Playlist::getTimestamp, Comparator.naturalOrder()));
+        List<String> topAlbums = new ArrayList<>();
+        int count = 0;
+        for (Playlist playlist : sortedAlbums) {
+            if (count >= LIMIT) {
+                break;
+            }
+            topAlbums.add(playlist.getName());
+            count++;
+        }
+        return topAlbums;
     }
 
     /**
@@ -324,6 +340,9 @@ public final class Admin {
         for (User user : users) {
             user.getFollowedPlaylists().removeIf(playlist -> playlist.getOwner().equals(deletedUser.getUsername()));
         }
+        for (Playlist playlist : deletedUser.getFollowedPlaylists()) {
+            playlist.decreaseFollowers();
+        }
     }
 
     public static String addAlbum(final User user, final String name, final Integer releaseYear,
@@ -374,7 +393,6 @@ public final class Admin {
     }
 
     private static boolean checkAlbumDelete(Album albumRemove) {
-
         for (User crtUser : users) {
             String sourceCollectionName = null;
             String sourceFileName = null;
@@ -427,6 +445,45 @@ public final class Admin {
             podcasts.add(podcastNew);
         }
         return message;
+    }
+
+    public static String removePodcast(final User user, final String name) {
+        if (!user.getUserType().equals(Enums.UserType.HOST)) {
+            return user.getUsername() + " is not a host.";
+        }
+        Host host = (Host) user;
+        Podcast podcastRemove = null;
+        for (Podcast podcast : host.getPodcasts()) {
+            if (podcast.getName().equals(name)) {
+                podcastRemove = podcast;
+                if (!checkPodcastDelete(podcastRemove)) {
+                    return host.getUsername() + " can't delete this podcast.";
+                }
+                podcasts.remove(podcastRemove);
+            }
+        }
+        if (podcastRemove == null) {
+            return host.getUsername() + " doesn't have a podcast with the given name.";
+        }
+        host.getPodcasts().remove(podcastRemove);
+        return host.getUsername() + " deleted the podcast successfully.";
+    }
+
+    private static boolean checkPodcastDelete(Podcast podcastRemove) {
+        for (User crtUser : users) {
+            String sourceCollectionName = null;
+            if (crtUser.getPlayer().getSource() != null) {
+                if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
+                    sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                }
+
+            }
+
+            if (podcastRemove.getName().equals(sourceCollectionName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
