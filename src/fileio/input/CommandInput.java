@@ -25,6 +25,8 @@ public final class CommandInput {
     private ArrayList<SongInput> songs;
     private String date;
     private Integer price;
+    private ArrayList<EpisodeInput> episodes;
+    private String nextPage;
 
     public CommandInput() {
     }

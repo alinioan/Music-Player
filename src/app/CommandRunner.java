@@ -554,13 +554,30 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode addAlbum(CommandInput commandInput) {
+    public static ObjectNode addAlbum(final CommandInput commandInput) {
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
         User user = Admin.getUser(commandInput.getUsername());
-        //TODO: check if user is valid
         String message = Admin.addAlbum(user, commandInput.getName(), commandInput.getReleaseYear(),
                                         commandInput.getDescription(), commandInput.getSongs());
 
-        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode removeAlbum(final CommandInput commandInput) {
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        User user = Admin.getUser(commandInput.getUsername());
+        String message = Admin.removeAlbum(user, commandInput.getName());
+
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("user", commandInput.getUsername());
@@ -623,7 +640,7 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode getAllUsers(CommandInput commandInput) {
+    public static ObjectNode getAllUsers(final CommandInput commandInput) {
         List<String> allUser = Admin.getAllUsers();
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -640,7 +657,7 @@ public final class CommandRunner {
      * @param commandInput command input.
      * @return object node with error message if the user doesn't exist or an empty object node.
      */
-    static ObjectNode checkUserNull(CommandInput commandInput) {
+    static ObjectNode checkUserNull(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = objectMapper.createObjectNode();
         if (user == null) {
@@ -659,7 +676,7 @@ public final class CommandRunner {
      * @param commandInput command input.
      * @return object node with error message if the user is offline or an empty object node.
      */
-    static ObjectNode checkUserOffline(CommandInput commandInput) {
+    static ObjectNode checkUserOffline(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = objectMapper.createObjectNode();
         if (!user.isOnline()) {
@@ -678,7 +695,7 @@ public final class CommandRunner {
      * @param commandInput command input.
      * @return the object node.
      */
-    static ObjectNode checkUser(CommandInput commandInput) {
+    static ObjectNode checkUser(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -687,7 +704,7 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode printCurrentPage(CommandInput commandInput) {
+    public static ObjectNode printCurrentPage(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -701,4 +718,8 @@ public final class CommandRunner {
         objectNode.put("message", message);
         return objectNode;
     }
+
+//    public static ObjectNode changePage() {
+//
+//    }
 }

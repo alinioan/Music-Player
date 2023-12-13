@@ -73,9 +73,8 @@ public final class Main {
         LibraryInput library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                + "library/library.json"),
                                                                LibraryInput.class);
-        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02") && !filePath1.contains("03")
-            && !filePath1.contains("04"))
-            return;
+//        if (!filePath1.contains("05"))
+//            return;
         CommandInput[] commands = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                   + filePath1),
                                                                   CommandInput[].class);
@@ -118,6 +117,7 @@ public final class Main {
                 case "addUser" -> outputs.add(CommandRunner.addUser(command));
                 case "deleteUser" -> outputs.add(CommandRunner.deleteUser(command));
                 case "addAlbum" -> outputs.add(CommandRunner.addAlbum(command));
+                case "removeAlbum" -> outputs.add(CommandRunner.removeAlbum(command));
                 case "showAlbums" -> outputs.add(CommandRunner.showAlbums(command));
                 case "addEvent" -> outputs.add(CommandRunner.addEvent(command));
                 case "addMerch" -> outputs.add(CommandRunner.addMerch(command));

@@ -53,7 +53,8 @@ public class PageManager {
         }
 
         if (user.getCreatorType().equals(Enums.UserType.HOST)) {
-            return artistPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
+//            return hostPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
+            return null;
         }
         return "";
     }

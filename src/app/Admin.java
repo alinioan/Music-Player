@@ -246,7 +246,9 @@ public final class Admin {
 
     public static String deleteUser(final String username) {
         User deleteUser = Admin.getUser(username);
-
+        if (deleteUser == null) {
+            return "The username " + username + " doesn't exist.";
+        }
         for (User user : users) {
             if (user.getUserType().equals(Enums.UserType.NORMAL)) {
                 if (user.getSlectedCreator() != null && user.getSlectedCreator().equals(username)) {
@@ -298,12 +300,6 @@ public final class Admin {
                         }
                     }
                 }
-
-//                for (Song likedSong : crtUser.getLikedSongs()) {
-//                    if (songAlbum.getName().equals(likedSong.getName())) {
-//                        return false;
-//                    }
-//                }
             }
         }
         return true;
@@ -311,14 +307,10 @@ public final class Admin {
 
     private static void deleteSongsArtist(Artist artist) {
         for (Album album : artist.getAlbums()) {
-            for (Song songAlbum : album.getSongs()) {
-                songs.removeIf(song -> songAlbum.getName().equals(song.getName()));
-                for (User user : users) {
-                    for (Playlist playlist : user.getPlaylists()) {
-//                        playlist.getSongs().removeIf(song -> songAlbum.getName().equals(song.getName()));
-                    }
-                    user.getLikedSongs().removeIf(song -> songAlbum.getName().equals(song.getName()));
-                }
+            songs.removeAll(album.getSongs());
+            for (User user : users) {
+                user.getLikedSongs().removeAll(album.getSongs());
+                // TODO: maybe have to remove songs from playlist idk
             }
         }
     }
@@ -342,6 +334,67 @@ public final class Admin {
         }
         songs.addAll(albumSongs);
         return ((Artist) user).addAlbum(name, releaseYear, description, albumSongs);
+    }
+
+    public static String removeAlbum(final User user, String name) {
+        if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
+            return user.getUsername() + " is not an artist.";
+        }
+        Artist artist = (Artist) user;
+        Album albumRemove = null;
+        for (Album album : artist.getAlbums()) {
+            if (album.getName().equals(name)) {
+                albumRemove = album;
+                if (!checkAlbumDelete(albumRemove)) {
+                    return artist.getUsername() + " can't delete this album.";
+                }
+                songs.removeAll(albumRemove.getSongs());
+                for (User userIter : users) {
+                    userIter.getLikedSongs().removeAll(albumRemove.getSongs());
+                    // TODO: maybe have to remove songs from playlist idk
+                }
+            }
+        }
+        if (albumRemove == null) {
+            return artist.getUsername() + " doesn't have an album with the given name.";
+        }
+        artist.getAlbums().remove(albumRemove);
+        return artist.getUsername() + " deleted the album successfully.\n";
+    }
+
+    private static boolean checkAlbumDelete(Album albumRemove) {
+
+        for (User crtUser : users) {
+            String sourceCollectionName = null;
+            String sourceFileName = null;
+            if (crtUser.getPlayer().getSource() != null) {
+                if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
+                    sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                }
+                if (crtUser.getPlayer().getSource().getAudioFile() != null) {
+                    sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
+                }
+            }
+
+            if (albumRemove.getName().equals(sourceCollectionName)) {
+                return false;
+            }
+
+            for (Song songAlbum : albumRemove.getSongs()) {
+                if (songAlbum.getName().equals(sourceFileName)) {
+                    return false;
+                }
+
+                for (Playlist playlist : crtUser.getPlaylists()) {
+                    for (Song songPlaylist : playlist.getSongs()) {
+                        if (songAlbum.getName().equals(songPlaylist.getName())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
