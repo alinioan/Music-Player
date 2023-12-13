@@ -11,6 +11,7 @@ import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.input.CommandInput;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -711,7 +712,8 @@ public final class CommandRunner {
             return objectNode;
         }
         String message = PageManager.printCurrentPage(user);
-
+        if (message == null)
+            System.out.println(user.getCurrentPage());
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
@@ -719,7 +721,19 @@ public final class CommandRunner {
         return objectNode;
     }
 
-//    public static ObjectNode changePage() {
-//
-//    }
+    public static ObjectNode changePage(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        String message = PageManager.changePage(user, commandInput.getNextPage());
+
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
 }

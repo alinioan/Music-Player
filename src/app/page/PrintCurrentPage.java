@@ -1,6 +1,9 @@
 package app.page;
 
+import app.Admin;
 import app.audio.Collections.Album;
+import app.audio.Collections.Playlist;
+import app.audio.Files.Song;
 import app.user.artist.Event;
 import app.user.artist.Merch;
 
@@ -14,7 +17,34 @@ public class PrintCurrentPage implements Visitor {
 
     @Override
     public String visit(LikedContentPage likedContentPage) {
-        return null;
+        StringBuilder page = new StringBuilder();
+
+        page.append("Liked songs:\n\t[");
+        for (Song song : likedContentPage.getSongs()) {
+            page.append(song.getName());
+            if (Admin.getUser(song.getArtist()) != null) {
+                page.append(" - ");
+                page.append(song.getArtist());
+            }
+            page.append(", ");
+        }
+        if (!likedContentPage.getSongs().isEmpty()) {
+            page.delete(page.length() - 2, page.length());
+        }
+
+        page.append("]\n\nFollowed playlists:\n\t[");
+        for (Playlist playlist : likedContentPage.getPlaylists()) {
+            page.append(playlist.getName());
+            page.append(" - ");
+            page.append(playlist.getOwner());
+            page.append(", ");
+        }
+        if (!likedContentPage.getPlaylists().isEmpty()) {
+            page.delete(page.length() - 2, page.length());
+        }
+        page.append("]");
+
+        return new String(page);
     }
 
     @Override

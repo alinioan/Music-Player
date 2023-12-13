@@ -73,7 +73,7 @@ public final class Main {
         LibraryInput library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                + "library/library.json"),
                                                                LibraryInput.class);
-//        if (!filePath1.contains("05"))
+//        if (!filePath1.contains("06"))
 //            return;
         CommandInput[] commands = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                   + filePath1),
@@ -123,6 +123,7 @@ public final class Main {
                 case "addMerch" -> outputs.add(CommandRunner.addMerch(command));
                 case "getAllUsers" -> outputs.add(CommandRunner.getAllUsers(command));
                 case "printCurrentPage" -> outputs.add(CommandRunner.printCurrentPage(command));
+                case "changePage" -> outputs.add(CommandRunner.changePage(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

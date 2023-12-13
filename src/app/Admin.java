@@ -141,6 +141,9 @@ public final class Admin {
      * @param newTimestamp the new timestamp
      */
     public static void updateTimestamp(final int newTimestamp) {
+        for (User user : users) {
+            PageManager.updatePages(user);
+        }
         int elapsed = newTimestamp - timestamp;
         timestamp = newTimestamp;
         if (elapsed == 0) {
@@ -259,8 +262,10 @@ public final class Admin {
                 }
             }
         }
-        if (deleteUser.getUserType().equals(Enums.UserType.ARTIST)) {
-            deleteSongsArtist((Artist) deleteUser);
+        switch (deleteUser.getUserType()) {
+            case ARTIST -> deleteSongsArtist((Artist) deleteUser);
+            case NORMAL -> deleteFollowedPlaylistsUser(deleteUser);
+            default -> {}
         }
         users.remove(deleteUser);
         return username + " was successfully deleted.";
@@ -312,6 +317,12 @@ public final class Admin {
                 user.getLikedSongs().removeAll(album.getSongs());
                 // TODO: maybe have to remove songs from playlist idk
             }
+        }
+    }
+
+    private static void deleteFollowedPlaylistsUser(User deletedUser) {
+        for (User user : users) {
+            user.getFollowedPlaylists().removeIf(playlist -> playlist.getOwner().equals(deletedUser.getUsername()));
         }
     }
 

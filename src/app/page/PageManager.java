@@ -18,7 +18,7 @@ public class PageManager {
     private static void addNormalPages(User user) {
          HomePage homePage = new HomePage(user.getLikedSongs(), user.getFollowedPlaylists());
          homePageHashMap.put(user.getUsername(), homePage);
-         LikedContentPage likedContentPage = new LikedContentPage(user.getLikedSongs(), user.getPlaylists());
+         LikedContentPage likedContentPage = new LikedContentPage(user.getLikedSongs(), user.getFollowedPlaylists());
          likedContentPageHashMap.put(user.getUsername(), likedContentPage);
     }
 
@@ -56,7 +56,12 @@ public class PageManager {
 //            return hostPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
             return null;
         }
-        return "";
+        return null;
+    }
+
+    public static String changePage(User user, String nextPage) {
+        user.setCurrentPage(nextPage);
+        return user.getUsername() + " accessed " + nextPage + " successfully.";
     }
 
     public static void reset() {
