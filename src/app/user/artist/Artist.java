@@ -85,6 +85,13 @@ public class Artist extends User {
         return false;
     }
 
+    public String removeEvent(final String name) {
+        if (!events.removeIf(event -> event.getName().equals(name))) {
+            return this.getUsername() + " doesn't have an event with the given name.";
+        }
+        return this.getUsername() + " deleted the event successfully.";
+    }
+
     public String addMerch(final String name, final String description, final Integer price) {
         Merch newMerch = new Merch(name, description, price);
         if (checkMerchExists(newMerch.getName())) {

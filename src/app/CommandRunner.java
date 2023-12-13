@@ -2,11 +2,13 @@ package app;
 
 import app.audio.Collections.AlbumOutput;
 import app.audio.Collections.PlaylistOutput;
+import app.audio.Collections.PodcastOutput;
 import app.page.PageManager;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.user.artist.Artist;
 import app.user.User;
+import app.user.host.Host;
 import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -620,6 +622,27 @@ public final class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode removeEvent(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+
+        if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
+            objectNode.put("message", commandInput.getUsername() + " is not an artist.");
+            return objectNode;
+        }
+        String message = ((Artist) user).removeEvent(commandInput.getName());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
     public static ObjectNode addMerch(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
@@ -636,6 +659,76 @@ public final class CommandRunner {
             return objectNode;
         }
         String message = ((Artist) user).addMerch(commandInput.getName(), commandInput.getDescription(), commandInput.getPrice());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
+    public static ObjectNode addPodcast(final CommandInput commandInput) {
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        User user = Admin.getUser(commandInput.getUsername());
+        String message = Admin.addPodcast(user, commandInput.getName(), commandInput.getEpisodes());
+
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode showPodcasts(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ArrayList<PodcastOutput> podcastOutputs = ((Host) user).showPodcasts();
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(podcastOutputs));
+
+        return objectNode;
+    }
+
+    public static ObjectNode addAnnouncement(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+
+        if (!user.getUserType().equals(Enums.UserType.HOST)) {
+            objectNode.put("message", commandInput.getUsername() + " is not a host.");
+            return objectNode;
+        }
+        String message = ((Host) user).addAnnouncement(commandInput.getName(), commandInput.getDescription());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
+    public static ObjectNode removeAnnouncement(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+
+        if (!user.getUserType().equals(Enums.UserType.HOST)) {
+            objectNode.put("message", commandInput.getUsername() + " is not a host.");
+            return objectNode;
+        }
+        String message = ((Host) user).removeAnnouncement(commandInput.getName());
         objectNode.put("message", message);
 
         return objectNode;

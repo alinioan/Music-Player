@@ -73,7 +73,7 @@ public final class Main {
         LibraryInput library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                + "library/library.json"),
                                                                LibraryInput.class);
-//        if (!filePath1.contains("06"))
+//        if (!filePath1.contains("09"))
 //            return;
         CommandInput[] commands = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                   + filePath1),
@@ -113,17 +113,22 @@ public final class Main {
                 case "getTop5Songs" -> outputs.add(CommandRunner.getTop5Songs(command));
                 case "getTop5Playlists" -> outputs.add(CommandRunner.getTop5Playlists(command));
                 case "switchConnectionStatus" -> outputs.add(CommandRunner.switchConnectionStatus(command));
-                case "getOnlineUsers" -> outputs.add(CommandRunner.getOnlineUsers(command));
                 case "addUser" -> outputs.add(CommandRunner.addUser(command));
                 case "deleteUser" -> outputs.add(CommandRunner.deleteUser(command));
                 case "addAlbum" -> outputs.add(CommandRunner.addAlbum(command));
                 case "removeAlbum" -> outputs.add(CommandRunner.removeAlbum(command));
                 case "showAlbums" -> outputs.add(CommandRunner.showAlbums(command));
                 case "addEvent" -> outputs.add(CommandRunner.addEvent(command));
+                case "removeEvent" -> outputs.add(CommandRunner.removeEvent(command));
                 case "addMerch" -> outputs.add(CommandRunner.addMerch(command));
-                case "getAllUsers" -> outputs.add(CommandRunner.getAllUsers(command));
+                case "addPodcast" -> outputs.add(CommandRunner.addPodcast(command));
+                case "showPodcasts" -> outputs.add(CommandRunner.showPodcasts(command));
+                case "addAnnouncement" -> outputs.add(CommandRunner.addAnnouncement(command));
+                case "removeAnnouncement" -> outputs.add(CommandRunner.removeAnnouncement(command));
                 case "printCurrentPage" -> outputs.add(CommandRunner.printCurrentPage(command));
                 case "changePage" -> outputs.add(CommandRunner.changePage(command));
+                case "getAllUsers" -> outputs.add(CommandRunner.getAllUsers(command));
+                case "getOnlineUsers" -> outputs.add(CommandRunner.getOnlineUsers(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

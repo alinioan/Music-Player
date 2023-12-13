@@ -3,9 +3,12 @@ package app.page;
 import app.Admin;
 import app.audio.Collections.Album;
 import app.audio.Collections.Playlist;
+import app.audio.Collections.Podcast;
+import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.user.artist.Event;
 import app.user.artist.Merch;
+import app.user.host.Announcement;
 
 import java.util.List;
 
@@ -92,6 +95,31 @@ public class PrintCurrentPage implements Visitor {
 
     @Override
     public String visit(HostPage hostPage) {
-        return null;
+        StringBuilder page = new StringBuilder();
+        page.append("Podcasts:\n\t[");
+        for (Podcast podcast : hostPage.getPodcasts()) {
+            page.append(podcast.getName());
+            page.append(":\n\t[");
+            for (Episode episode : podcast.getEpisodes()) {
+                page.append(episode.getName());
+                page.append(" - ");
+                page.append(episode.getDescription());
+                page.append(", ");
+            }
+            page.delete(page.length() - 2, page.length());
+            page.append("]\n, ");
+        }
+        page.delete(page.length() - 2, page.length());
+
+        page.append("]\n\nAnnouncements:\n\t[");
+        for (Announcement announcement : hostPage.getAnnouncements()) {
+            page.append(announcement.getName());
+            page.append(":\n\t");
+            page.append(announcement.getDescription());
+            page.append("\n");
+        }
+        page.append("]");
+
+        return new String(page);
     }
 }

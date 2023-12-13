@@ -408,6 +408,27 @@ public final class Admin {
         return true;
     }
 
+    public static String addPodcast(final User user, final String name, final ArrayList<EpisodeInput> episodeInputs) {
+        if (!user.getUserType().equals(Enums.UserType.HOST)) {
+            return user.getUsername() + " is not a host.";
+        }
+        ArrayList<Episode> podcastEpisodes = new ArrayList<>();
+        for (EpisodeInput episodeInput : episodeInputs) {
+            for (Episode episodeCheck : podcastEpisodes) {
+                if (episodeCheck.getName().equals(episodeInput.getName())) {
+                    return user.getUsername() + " has the same episode in this podcast.";
+                }
+            }
+            podcastEpisodes.add(new Episode(episodeInput.getName(), episodeInput.getDuration(), episodeInput.getDescription()));
+        }
+        Podcast podcastNew = new Podcast(name, user.getUsername(), podcastEpisodes);
+        String message = ((Host) user).addPodcast(podcastNew);
+        if (!message.contains("same name")) {
+            podcasts.add(podcastNew);
+        }
+        return message;
+    }
+
     /**
      * Reset.
      */

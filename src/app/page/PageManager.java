@@ -28,7 +28,8 @@ public class PageManager {
     }
 
     private static void addHostPage(Host host) {
-
+        HostPage hostPage = new HostPage(host.getPodcasts(), host.getAnnouncements());
+        hostPageHashMap.put(host.getUsername(), hostPage);
     }
 
     public static void updatePages(User user) {
@@ -53,8 +54,7 @@ public class PageManager {
         }
 
         if (user.getCreatorType().equals(Enums.UserType.HOST)) {
-//            return hostPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
-            return null;
+            return hostPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
         }
         return null;
     }
