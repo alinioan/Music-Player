@@ -12,7 +12,6 @@ import app.utils.Enums;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +37,9 @@ public class User implements Comparable<User> {
     private boolean lastSearched;
     @Setter
     private boolean connectionStatus;
-    @Getter
-    private String slectedCreator;
-    @Getter
+    @Getter @Setter
+    private String selectedCreator;
+    @Getter @Setter
     private Enums.UserType creatorType;
     @Getter
     private Enums.UserType userType;
@@ -66,7 +65,7 @@ public class User implements Comparable<User> {
         lastSearched = false;
         this.connectionStatus = true;
         this.userType = Enums.UserType.NORMAL;
-        this.currentPage = "home";
+        this.currentPage = "Home";
     }
 
     /**
@@ -123,8 +122,8 @@ public class User implements Comparable<User> {
             return "The selected ID is too high.";
         }
         this.creatorType = selected.getUserType();
-        this.slectedCreator = selected.getUsername();
-        return "Successfully selected " + this.slectedCreator + "'s page.";
+        this.selectedCreator = selected.getUsername();
+        return "Successfully selected " + this.selectedCreator + "'s page.";
     }
 
     /**
@@ -277,7 +276,7 @@ public class User implements Comparable<User> {
             return "Please load a source before liking or unliking.";
         }
 
-        if (!player.getType().equals("song") && !player.getType().equals("playlist")) {
+        if (!player.getType().equals("song") && !player.getType().equals("playlist") && !player.getType().equals("album")) {
             return "Loaded source is not a song.";
         }
 
@@ -528,7 +527,7 @@ public class User implements Comparable<User> {
      */
     public String switchConnectionStatus() {
         if (userType != Enums.UserType.NORMAL) {
-            return username + " is not a normal user";
+            return username + " is not a normal user.";
         }
         connectionStatus = !connectionStatus;
         player.setConnectionStatus(connectionStatus);

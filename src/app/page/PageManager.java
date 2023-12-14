@@ -43,23 +43,25 @@ public class PageManager {
     public static String printCurrentPage(User user) {
         Visitor pagePrinter = new PrintCurrentPage();
         if (user.getCreatorType() == null) {
-            if (user.getCurrentPage().equals("home")) {
+            if (user.getCurrentPage().equals("Home")) {
                 return homePageHashMap.get(user.getUsername()).accept(pagePrinter);
             }
             return likedContentPageHashMap.get(user.getUsername()).accept(pagePrinter);
         }
 
         if (user.getCreatorType().equals(Enums.UserType.ARTIST)) {
-            return artistPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
+            return artistPageHashMap.get(user.getSelectedCreator()).accept(pagePrinter);
         }
 
         if (user.getCreatorType().equals(Enums.UserType.HOST)) {
-            return hostPageHashMap.get(user.getSlectedCreator()).accept(pagePrinter);
+            return hostPageHashMap.get(user.getSelectedCreator()).accept(pagePrinter);
         }
         return null;
     }
 
     public static String changePage(User user, String nextPage) {
+        user.setSelectedCreator(null);
+        user.setCreatorType(null);
         user.setCurrentPage(nextPage);
         return user.getUsername() + " accessed " + nextPage + " successfully.";
     }

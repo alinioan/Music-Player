@@ -25,10 +25,8 @@ public class PrintCurrentPage implements Visitor {
         page.append("Liked songs:\n\t[");
         for (Song song : likedContentPage.getSongs()) {
             page.append(song.getName());
-            if (Admin.getUser(song.getArtist()) != null) {
-                page.append(" - ");
-                page.append(song.getArtist());
-            }
+            page.append(" - ");
+            page.append(song.getArtist());
             page.append(", ");
         }
         if (!likedContentPage.getSongs().isEmpty()) {

@@ -15,6 +15,14 @@ public class Album extends Playlist {
         super.setSongs(songs);
     }
 
+    public Integer getAlbumLikes() {
+        Integer likes = 0;
+        for (Song song : this.getSongs()) {
+            likes += song.getLikes();
+        }
+        return likes;
+    }
+
     @Override
     public boolean matchesDescription(String description) {
         return this.description.toLowerCase().startsWith(description);

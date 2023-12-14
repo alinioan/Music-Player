@@ -111,4 +111,13 @@ public class Artist extends User {
         }
         return false;
     }
+
+    public Integer getArtistLikes() {
+        Integer likes = 0;
+        for (Album album : albums) {
+            likes += album.getAlbumLikes();
+        }
+        return likes;
+    }
+
 }

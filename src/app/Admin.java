@@ -15,6 +15,7 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import lombok.Getter;
+import net.sf.saxon.functions.hof.UserFunctionReference;
 
 import java.util.*;
 
@@ -198,20 +199,43 @@ public final class Admin {
     }
 
     public static List<String> getTop5Albums() {
-        List<Playlist> sortedAlbums = new ArrayList<>(getAlbums());
-        sortedAlbums.sort(Comparator.comparingInt(Playlist::getFollowers)
+        List<Album> sortedAlbums = new ArrayList<>(getAlbums());
+        sortedAlbums.sort(Comparator.comparingInt(Album::getAlbumLikes)
                 .reversed()
-                .thenComparing(Playlist::getTimestamp, Comparator.naturalOrder()));
+                .thenComparing(Album::getName, Comparator.naturalOrder()));
         List<String> topAlbums = new ArrayList<>();
         int count = 0;
-        for (Playlist playlist : sortedAlbums) {
+        for (Album album : sortedAlbums) {
             if (count >= LIMIT) {
                 break;
             }
-            topAlbums.add(playlist.getName());
+            topAlbums.add(album.getName());
             count++;
         }
         return topAlbums;
+    }
+
+    public static List<String> getTop5Artists() {
+        List<Artist> sortedArtists = new ArrayList<>();
+
+        for (User user : users) {
+            if (user.getUserType().equals(Enums.UserType.ARTIST)) {
+                sortedArtists.add((Artist) user);
+            }
+        }
+        sortedArtists.sort(Comparator.comparingInt(Artist::getArtistLikes)
+                .reversed()
+                .thenComparing(Artist::getUsername, Comparator.naturalOrder()));
+        List<String> topArtists = new ArrayList<>();
+        int count = 0;
+        for (Artist artist : sortedArtists) {
+            if (count >= LIMIT) {
+                break;
+            }
+            topArtists.add(artist.getUsername());
+            count++;
+        }
+        return topArtists;
     }
 
     /**
@@ -222,7 +246,7 @@ public final class Admin {
     public static List<String> getOnlineUsers() {
         List<String> onlineUsers = new ArrayList<>();
         for (User user : users) {
-            if (user.isOnline()) {
+            if (user.isOnline() && user.getUserType().equals(Enums.UserType.NORMAL)) {
                 onlineUsers.add(user.getUsername());
             }
         }
@@ -270,10 +294,16 @@ public final class Admin {
         }
         for (User user : users) {
             if (user.getUserType().equals(Enums.UserType.NORMAL)) {
-                if (user.getSlectedCreator() != null && user.getSlectedCreator().equals(username)) {
+                if (user.getSelectedCreator() != null && user.getSelectedCreator().equals(username)) {
                     return username + " can't be deleted.";
                 }
                 if (!checkArtistAlbumsDelete(user, deleteUser)) {
+                    return username + " can't be deleted.";
+                }
+                if (!checkUsersPlaylistsDelete(user, deleteUser)) {
+                    return username + " can't be deleted.";
+                }
+                if (!checkHostPodcastsDelete(user, deleteUser)) {
                     return username + " can't be deleted.";
                 }
             }
@@ -326,6 +356,64 @@ public final class Admin {
         return true;
     }
 
+    private static boolean checkUsersPlaylistsDelete(User crtUser, User deleteUser) {
+        String sourceCollectionName = null;
+        String sourceFileName = null;
+
+        if (crtUser.getPlayer().getSource() != null) {
+            if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
+                sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+            }
+            if (crtUser.getPlayer().getSource().getAudioFile() != null) {
+                sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
+            }
+        }
+
+        for (Playlist playlist : deleteUser.getPlaylists()) {
+            if (playlist.getName().equals(sourceCollectionName)) {
+                return false;
+            }
+
+            for (Song song : playlist.getSongs()) {
+                if (song.getName().equals(sourceFileName)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean checkHostPodcastsDelete(User crtUser, User host) {
+        String sourceCollectionName = null;
+        String sourceFileName = null;
+
+        if (crtUser.getPlayer().getSource() != null) {
+            if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
+                sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+            }
+            if (crtUser.getPlayer().getSource().getAudioFile() != null) {
+                sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
+            }
+        }
+
+        if (!host.getUserType().equals(Enums.UserType.HOST)) {
+            return true;
+        }
+
+        for (Podcast podcast : ((Host) host).getPodcasts()) {
+            if (podcast.getName().equals(sourceCollectionName)) {
+                return false;
+            }
+
+            for (Episode episode : podcast.getEpisodes()) {
+                if (episode.getName().equals(sourceFileName)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private static void deleteSongsArtist(Artist artist) {
         for (Album album : artist.getAlbums()) {
             songs.removeAll(album.getSongs());
@@ -349,6 +437,12 @@ public final class Admin {
                                   final String description, final ArrayList<SongInput> songInputs) {
         if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
             return user.getUsername() + " is not an artist.";
+        }
+
+        for (Album album : ((Artist) user).getAlbums()) {
+            if (album.getName().equals(name)) {
+                return user.getUsername() + " has another album with the same name.";
+            }
         }
 
         ArrayList<Song> albumSongs = new ArrayList<>();

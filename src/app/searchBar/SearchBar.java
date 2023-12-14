@@ -55,6 +55,7 @@ public final class SearchBar {
     public void clearSelection() {
         lastSelected = null;
         lastSearchType = null;
+        lastSelectedUser = null;
     }
 
     /**

@@ -502,6 +502,17 @@ public final class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode getTop5Artists(final CommandInput commandInput) {
+        List<String> playlists = Admin.getTop5Artists();
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(playlists));
+
+        return objectNode;
+    }
+
     /**
      * Switch the connection status.
      *
