@@ -9,38 +9,73 @@ import lombok.Getter;
 import java.util.HashMap;
 
 @Getter
-public class PageManager {
+public final class PageManager {
     private static HashMap<String, HomePage> homePageHashMap = new HashMap<>();
     private static HashMap<String, LikedContentPage> likedContentPageHashMap = new HashMap<>();
     private static HashMap<String, ArtistPage> artistPageHashMap = new HashMap<>();
     private static HashMap<String, HostPage> hostPageHashMap = new HashMap<>();
 
-    private static void addNormalPages(User user) {
+    private PageManager() {
+
+    }
+
+    /**
+     * Create a pages from user and add them to the maps.
+     *
+     * @param user the user.
+     */
+    private static void addNormalPages(final User user) {
          HomePage homePage = new HomePage(user.getLikedSongs(), user.getFollowedPlaylists());
          homePageHashMap.put(user.getUsername(), homePage);
-         LikedContentPage likedContentPage = new LikedContentPage(user.getLikedSongs(), user.getFollowedPlaylists());
+         LikedContentPage likedContentPage = new LikedContentPage(user.getLikedSongs(),
+                                                    user.getFollowedPlaylists());
          likedContentPageHashMap.put(user.getUsername(), likedContentPage);
     }
 
-    private static void addArtistPage(Artist artist) {
-        ArtistPage artistPage = new ArtistPage(artist.getAlbums(), artist.getEvents(), artist.getMerches());
+    /**
+     * Create page from artist and add it to the map.
+     *
+     * @param artist the artist.
+     */
+    private static void addArtistPage(final Artist artist) {
+        ArtistPage artistPage = new ArtistPage(artist.getAlbums(),
+                                    artist.getEvents(), artist.getMerches());
         artistPageHashMap.put(artist.getUsername(), artistPage);
     }
 
-    private static void addHostPage(Host host) {
+    /**
+     * Create page from host and add it to the map.
+     *
+     * @param host the host.
+     */
+    private static void addHostPage(final Host host) {
         HostPage hostPage = new HostPage(host.getPodcasts(), host.getAnnouncements());
         hostPageHashMap.put(host.getUsername(), hostPage);
     }
 
-    public static void updatePages(User user) {
+    /**
+     * Update pages.
+     *
+     * @param user the user.
+     */
+    public static void updatePages(final User user) {
         switch (user.getUserType()) {
             case ARTIST -> addArtistPage((Artist) user);
             case HOST -> addHostPage((Host) user);
             case NORMAL -> addNormalPages(user);
+            default -> {
+
+            }
         }
     }
 
-    public static String printCurrentPage(User user) {
+    /**
+     * Print current page.
+     *
+     * @param user the user.
+     * @return output message.
+     */
+    public static String printCurrentPage(final User user) {
         Visitor pagePrinter = new PrintCurrentPage();
         if (user.getCreatorType() == null) {
             if (user.getCurrentPage().equals("Home")) {
@@ -59,13 +94,23 @@ public class PageManager {
         return null;
     }
 
-    public static String changePage(User user, String nextPage) {
+    /**
+     * Change page from user.
+     *
+     * @param user the user.
+     * @param nextPage the next page.
+     * @return the output message.
+     */
+    public static String changePage(final User user, final String nextPage) {
         user.setSelectedCreator(null);
         user.setCreatorType(null);
         user.setCurrentPage(nextPage);
         return user.getUsername() + " accessed " + nextPage + " successfully.";
     }
 
+    /**
+     * Resets the page maps.
+     */
     public static void reset() {
         homePageHashMap = new HashMap<>();
         likedContentPageHashMap = new HashMap<>();

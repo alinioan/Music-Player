@@ -22,7 +22,7 @@ public class Artist extends User {
      * @param age      the age
      * @param city     the city
      */
-    public Artist(String username, int age, String city) {
+    public Artist(final String username, final int age, final String city) {
         super(username, age, city);
         super.setUserType(Enums.UserType.ARTIST);
         super.setConnectionStatus(false);
@@ -32,6 +32,15 @@ public class Artist extends User {
         merches = new ArrayList<>();
     }
 
+    /**
+     * Add a new album.
+     *
+     * @param name the name.
+     * @param releaseYear the year.
+     * @param description the description.
+     * @param songs the songs.
+     * @return output message.
+     */
     public String addAlbum(final String name, final Integer releaseYear,
                            final String description, final ArrayList<Song> songs) {
         Album album = new Album(name, this.getUsername(), releaseYear, description, songs);
@@ -43,10 +52,17 @@ public class Artist extends User {
         return this.getUsername() + " has added new album successfully.";
     }
 
-    private boolean checkAlbumExists(String name) {
+    /**
+     * Check if an album already exists.
+     *
+     * @param name the name.
+     * @return true if it exists.
+     */
+    private boolean checkAlbumExists(final String name) {
         for (Album album : albums) {
-            if (album.getName().equals(name))
+            if (album.getName().equals(name)) {
                 return true;
+            }
         }
         return false;
     }
@@ -65,6 +81,14 @@ public class Artist extends User {
         return albumOutputs;
     }
 
+    /**
+     * Add a new event.
+     *
+     * @param name the name.
+     * @param description the descriptionn.
+     * @param date the date.
+     * @return output message.
+     */
     public String addEvent(final String name, final String description, final String date) {
         Event newEvent = new Event(name, description, date);
         if (checkEventExists(newEvent.getName())) {
@@ -77,14 +101,27 @@ public class Artist extends User {
         return this.getUsername() + " has added new event successfully.";
     }
 
-    private boolean checkEventExists(String name) {
+    /**
+     * Check if an event with that name already exists.
+     *
+     * @param name the name.
+     * @return true if it exists.
+     */
+    private boolean checkEventExists(final String name) {
         for (Event event : events) {
-            if (event.getName().equals(name))
+            if (event.getName().equals(name)) {
                 return true;
+            }
         }
         return false;
     }
 
+    /**
+     * Remove an event.
+     *
+     * @param name the name.
+     * @return output message.
+     */
     public String removeEvent(final String name) {
         if (!events.removeIf(event -> event.getName().equals(name))) {
             return this.getUsername() + " doesn't have an event with the given name.";
@@ -92,6 +129,14 @@ public class Artist extends User {
         return this.getUsername() + " deleted the event successfully.";
     }
 
+    /**
+     * Add merch.
+     *
+     * @param name the name.
+     * @param description the description.
+     * @param price the price.
+     * @return output message.
+     */
     public String addMerch(final String name, final String description, final Integer price) {
         Merch newMerch = new Merch(name, description, price);
         if (checkMerchExists(newMerch.getName())) {
@@ -104,14 +149,26 @@ public class Artist extends User {
         return this.getUsername() + " has added new merchandise successfully.";
     }
 
-    private boolean checkMerchExists(String name) {
+    /**
+     * Check if a merch with that name already exists.
+     *
+     * @param name the name.
+     * @return true if it finds a merch with that name.
+     */
+    private boolean checkMerchExists(final String name) {
         for (Merch merch : merches) {
-            if (merch.getName().equals(name))
+            if (merch.getName().equals(name)) {
                 return true;
+            }
         }
         return false;
     }
 
+    /**
+     * Get the total likes of the artists songs.
+     *
+     * @return number of like.
+     */
     public Integer getArtistLikes() {
         Integer likes = 0;
         for (Album album : albums) {

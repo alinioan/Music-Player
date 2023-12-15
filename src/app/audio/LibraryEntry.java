@@ -120,6 +120,12 @@ public abstract class LibraryEntry {
         return false;
     }
 
+    /**
+     * Match description.
+     *
+     * @param description the description.
+     * @return the boolean.
+     */
     public boolean matchesDescription(final String description) {
        return false;
     }

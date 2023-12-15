@@ -106,16 +106,32 @@ public class Playlist extends AudioCollection {
         followers--;
     }
 
+    /**
+     * Get number of tracks.
+     * @return the number.
+     */
     @Override
     public int getNumberOfTracks() {
         return songs.size();
     }
 
+    /**
+     * Get track by index.
+     *
+     * @param index the index
+     * @return the audio file.
+     */
     @Override
     public AudioFile getTrackByIndex(final int index) {
         return songs.get(index);
     }
 
+    /**
+     * Check if the playlist is visible to a user.
+     *
+     * @param user the user
+     * @return true if it is visible.
+     */
     @Override
     public boolean isVisibleToUser(final String user) {
         return this.getVisibility() == Enums.Visibility.PUBLIC
@@ -123,11 +139,22 @@ public class Playlist extends AudioCollection {
                    && this.getOwner().equals(user));
     }
 
+    /**
+     * Matches followers.
+     * @param followerNum the followers
+     * @return the boolean.
+     */
     @Override
     public boolean matchesFollowers(final String followerNum) {
         return filterByFollowersCount(this.getFollowers(), followerNum);
     }
 
+    /**
+     * Filter by follower count.
+     * @param count the count.
+     * @param query the query.
+     * @return the boolean.
+     */
     private static boolean filterByFollowersCount(final int count, final String query) {
         if (query.startsWith("<")) {
             return count < Integer.parseInt(query.substring(1));

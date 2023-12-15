@@ -141,6 +141,13 @@ public final class FilterUtils {
         return filter(entries, entry -> entry.matchesFollowers(followers));
     }
 
+    /**
+     * Filter by description.
+     *
+     * @param entries the entries.
+     * @param description the description.
+     * @return the list.
+     */
     public static List<LibraryEntry> filterByDescription(final List<LibraryEntry> entries,
                                                          final String description) {
         return filter(entries, entry -> entry.matchesDescription(description));
@@ -157,11 +164,20 @@ public final class FilterUtils {
         return result;
     }
 
+    /**
+     * Filter users by name.
+     *
+     * @param entries list of users.
+     * @param name the name.
+     * @param type the user type.
+     * @return the list.
+     */
     public static List<User> filterUserByName(final List<User> entries,
                                               final String name, final Enums.UserType type) {
         List<User> result = new ArrayList<>();
         for (User user : entries) {
-            if (user.getUsername().toLowerCase().startsWith(name) && user.getUserType().equals(type)) {
+            if (user.getUsername().toLowerCase().startsWith(name)
+                && user.getUserType().equals(type)) {
                 result.add(user);
             }
         }

@@ -1,10 +1,32 @@
 package app.page;
 
-import app.user.host.Host;
-
 public interface Visitor {
-    public String visit(HomePage homePage);
-    public String visit(ArtistPage artistPage);
-    public String visit(LikedContentPage likedContentPage);
-    public String visit(HostPage hostPage);
+
+    /**
+     * Visit home page
+     * @param homePage the page.
+     * @return the page as a string.
+     */
+    String visit(HomePage homePage);
+
+    /**
+     * Visit artist page
+     * @param artistPage the page.
+     * @return the page as a string.
+     */
+    String visit(ArtistPage artistPage);
+
+    /**
+     * Visit likedContent page
+     * @param likedContentPage the page.
+     * @return the page as a string.
+     */
+    String visit(LikedContentPage likedContentPage);
+
+    /**
+     * Visit host page
+     * @param hostPage the page.
+     * @return the page as a string.
+     */
+    String visit(HostPage hostPage);
 }

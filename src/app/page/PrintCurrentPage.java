@@ -1,6 +1,5 @@
 package app.page;
 
-import app.Admin;
 import app.audio.Collections.Album;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.Podcast;
@@ -12,14 +11,30 @@ import app.user.host.Announcement;
 
 import java.util.List;
 
-public class PrintCurrentPage implements Visitor {
+/**
+ * Visitor that prints pages.
+ */
+public final class PrintCurrentPage implements Visitor {
+    /**
+     * Print home page
+     *
+     * @param homePage the page.
+     * @return the page as a string
+     */
     @Override
-    public String visit(HomePage homePage) {
-        return "Liked songs:\n\t" + homePage.getSongs().toString() + "\n\nFollowed playlists:\n\t" + homePage.getPlaylists().toString();
+    public String visit(final HomePage homePage) {
+        return "Liked songs:\n\t" + homePage.getSongs().toString()
+                + "\n\nFollowed playlists:\n\t" + homePage.getPlaylists().toString();
     }
 
+    /**
+     * Print liked content page
+     *
+     * @param likedContentPage the page.
+     * @return the page as a string
+     */
     @Override
-    public String visit(LikedContentPage likedContentPage) {
+    public String visit(final LikedContentPage likedContentPage) {
         StringBuilder page = new StringBuilder();
 
         page.append("Liked songs:\n\t[");
@@ -48,8 +63,14 @@ public class PrintCurrentPage implements Visitor {
         return new String(page);
     }
 
+    /**
+     * Print artist page
+     *
+     * @param artistPage the page.
+     * @return the page as a string
+     */
     @Override
-    public String visit(ArtistPage artistPage) {
+    public String visit(final ArtistPage artistPage) {
         StringBuilder page = new StringBuilder();
         page.append("Albums:\n\t[");
         List<Album> albums = artistPage.getAlbums();
@@ -91,8 +112,14 @@ public class PrintCurrentPage implements Visitor {
         return new String(page);
     }
 
+    /**
+     * Print the host page
+     *
+     * @param hostPage the page.
+     * @return the page as a string
+     */
     @Override
-    public String visit(HostPage hostPage) {
+    public String visit(final HostPage hostPage) {
         StringBuilder page = new StringBuilder();
         page.append("Podcasts:\n\t[");
         for (Podcast podcast : hostPage.getPodcasts()) {

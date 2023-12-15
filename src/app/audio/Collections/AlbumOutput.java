@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class AlbumOutput {
-    String name;
-    ArrayList<String> songs = new ArrayList<>();
+public final class AlbumOutput {
+    private String name;
+    private ArrayList<String> songs = new ArrayList<>();
 
     public AlbumOutput(final Album album) {
         this.name = album.getName();

@@ -1,6 +1,8 @@
 package app.user;
 
-import app.audio.Collections.*;
+import app.audio.Collections.AudioCollection;
+import app.audio.Collections.Playlist;
+import app.audio.Collections.PlaylistOutput;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
@@ -108,7 +110,8 @@ public class User implements Comparable<User> {
 
         lastSearched = false;
 
-        if (!searchBar.getLastSearchType().equals("artist") && !searchBar.getLastSearchType().equals("host")) {
+        if (!searchBar.getLastSearchType().equals("artist")
+            && !searchBar.getLastSearchType().equals("host")) {
             LibraryEntry selected = searchBar.select(itemNumber);
 
             if (selected == null) {
@@ -276,7 +279,8 @@ public class User implements Comparable<User> {
             return "Please load a source before liking or unliking.";
         }
 
-        if (!player.getType().equals("song") && !player.getType().equals("playlist") && !player.getType().equals("album")) {
+        if (!player.getType().equals("song") && !player.getType().equals("playlist")
+            && !player.getType().equals("album")) {
             return "Loaded source is not a song.";
         }
 
@@ -539,12 +543,18 @@ public class User implements Comparable<User> {
      *
      * @param userType The Enums.UserType to be set as the user type.
      */
-    public void setUserType(Enums.UserType userType) {
+    public void setUserType(final Enums.UserType userType) {
         this.userType = userType;
     }
 
+    /**
+     * Compares users by type.
+     *
+     * @param o the object to be compared.
+     * @return the compare result
+     */
     @Override
-    public int compareTo(User o) {
+    public int compareTo(final User o) {
         return userType.compareTo(o.getUserType());
     }
 }

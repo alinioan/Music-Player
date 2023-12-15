@@ -11,12 +11,18 @@ import java.util.List;
 
 @Getter
 @Setter
-public class HomePage implements Visitable {
+public final class HomePage implements Visitable {
     private ArrayList<String> playlists;
     private ArrayList<String> songs;
-    private static int LIMIT = 5;
+    private static final int LIMIT = 5;
 
-    public HomePage(ArrayList<Song> likedSongs, ArrayList<Playlist> followedPlaylist) {
+    /**
+     * Constructor instantiates with the top 5 songs by likes and the top 5 playlist by likes
+     *
+     * @param likedSongs the songs
+     * @param followedPlaylist the playlist
+     */
+    public HomePage(final ArrayList<Song> likedSongs, final ArrayList<Playlist> followedPlaylist) {
         List<Song> sortedSongs = new ArrayList<>(likedSongs);
         sortedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
         this.songs = new ArrayList<>();
@@ -41,7 +47,7 @@ public class HomePage implements Visitable {
         }
     }
 
-    private static int calculateTotalLikes(Playlist playlist) {
+    private static int calculateTotalLikes(final Playlist playlist) {
         int totalLikes = 0;
         if (playlist.getSongs() != null) {
             for (Song song : playlist.getSongs()) {
@@ -54,7 +60,7 @@ public class HomePage implements Visitable {
     }
 
     @Override
-    public String accept(Visitor visitor) {
+    public String accept(final Visitor visitor) {
         return visitor.visit(this);
     }
 }

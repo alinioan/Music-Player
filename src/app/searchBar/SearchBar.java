@@ -3,7 +3,6 @@ package app.searchBar;
 
 import app.Admin;
 import app.audio.LibraryEntry;
-import app.page.PageManager;
 import app.user.User;
 import app.utils.Enums;
 import lombok.Getter;
@@ -59,7 +58,7 @@ public final class SearchBar {
     }
 
     /**
-     * Search list.
+     * Search list of Library entries.
      *
      * @param filters the filters
      * @param type    the type
@@ -160,6 +159,13 @@ public final class SearchBar {
         return this.results;
     }
 
+    /**
+     * Search list of users.
+     *
+     * @param filter the filters
+     * @param type    the type
+     * @return the list
+     */
     public List<User> searchUsers(final Filters filter, final String type) {
         List<User> entries;
         switch (type) {
@@ -211,6 +217,12 @@ public final class SearchBar {
         }
     }
 
+    /**
+     * Select user.
+     *
+     * @param itemNumber the item number.
+     * @return the user.
+     */
     public User selectUser(final Integer itemNumber) {
         if (this.resultsUsers.size() < itemNumber) {
             resultsUsers.clear();

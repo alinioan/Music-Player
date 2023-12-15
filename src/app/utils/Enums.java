@@ -1,11 +1,19 @@
 package app.utils;
 
-public class Enums { // diferite enumuri, le-am gurpat pe toate intr-un loc
+public final class Enums {
+
+    /**
+     * Private constructor for utility class
+     */
+    private Enums() {
+
+    }
+
     public enum Genre {
         POP,
         ROCK,
         RAP
-    } // etc
+    }
 
     public enum Visibility {
         PUBLIC,
@@ -38,11 +46,17 @@ public class Enums { // diferite enumuri, le-am gurpat pe toate intr-un loc
      * @param type the type.
      * @return the enum.
      */
-    public static UserType getTypeFromString(String type) {
+    public static UserType getTypeFromString(final String type) {
         switch (type) {
-            case "artist" -> { return UserType.ARTIST; }
-            case "host" -> { return UserType.HOST; }
-            default -> { return UserType.NORMAL; }
+            case "artist" -> {
+                return UserType.ARTIST;
+            }
+            case "host" -> {
+                return UserType.HOST;
+            }
+            default -> {
+                return UserType.NORMAL;
+            }
         }
     }
 }

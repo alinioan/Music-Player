@@ -73,8 +73,6 @@ public final class Main {
         LibraryInput library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                + "library/library.json"),
                                                                LibraryInput.class);
-//        if (!filePath1.contains("15"))
-//            return;
         CommandInput[] commands = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
                                                                   + filePath1),
                                                                   CommandInput[].class);
@@ -114,7 +112,8 @@ public final class Main {
                 case "getTop5Playlists" -> outputs.add(CommandRunner.getTop5Playlists(command));
                 case "getTop5Albums" -> outputs.add(CommandRunner.getTop5Albums(command));
                 case "getTop5Artists" -> outputs.add(CommandRunner.getTop5Artists(command));
-                case "switchConnectionStatus" -> outputs.add(CommandRunner.switchConnectionStatus(command));
+                case "switchConnectionStatus" ->
+                        outputs.add(CommandRunner.switchConnectionStatus(command));
                 case "addUser" -> outputs.add(CommandRunner.addUser(command));
                 case "deleteUser" -> outputs.add(CommandRunner.deleteUser(command));
                 case "addAlbum" -> outputs.add(CommandRunner.addAlbum(command));

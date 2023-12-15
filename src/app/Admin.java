@@ -15,9 +15,11 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import lombok.Getter;
-import net.sf.saxon.functions.hof.UserFunctionReference;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Collections;
 
 /**
  * The type Admin.
@@ -110,6 +112,11 @@ public final class Admin {
         return playlists;
     }
 
+    /**
+     * Get albums.
+     *
+     * @return the list of albums.
+     */
     public static List<Album> getAlbums() {
         List<Album> albums = new ArrayList<>();
         for (User user : users) {
@@ -198,6 +205,11 @@ public final class Admin {
         return topPlaylists;
     }
 
+    /**
+     * Get top 5 albums.
+     *
+     * @return the top 5 albums.
+     */
     public static List<String> getTop5Albums() {
         List<Album> sortedAlbums = new ArrayList<>(getAlbums());
         sortedAlbums.sort(Comparator.comparingInt(Album::getAlbumLikes)
@@ -215,6 +227,11 @@ public final class Admin {
         return topAlbums;
     }
 
+    /**
+     * Get top 5 artist.
+     *
+     * @return the top 5 artists.
+     */
     public static List<String> getTop5Artists() {
         List<Artist> sortedArtists = new ArrayList<>();
 
@@ -253,6 +270,11 @@ public final class Admin {
         return onlineUsers;
     }
 
+    /**
+     * Get all users.
+     *
+     * @return list of users.
+     */
     public static List<String> getAllUsers() {
         Collections.sort(users);
         List<String> allUsers = new ArrayList<>();
@@ -271,12 +293,15 @@ public final class Admin {
      * @param type the type fo the user.
      * @return output message.
      */
-    public static String addUser(final String name, final Integer age, final String city, final Enums.UserType type) {
-        User newUser = null;
+    public static String addUser(final String name, final Integer age,
+                                 final String city, final Enums.UserType type) {
+        User newUser = new User(name, age, city);
         switch (type) {
-            case NORMAL -> newUser = new User(name, age, city);
             case ARTIST -> newUser = new Artist(name, age, city);
             case HOST -> newUser = new Host(name, age, city);
+            default -> {
+
+            }
         }
         for (User user : users) {
             if (user.getUsername().equals(newUser.getUsername())) {
@@ -287,6 +312,12 @@ public final class Admin {
         return "The username " + newUser.getUsername() + " has been added successfully.";
     }
 
+    /**
+     * Delete a user.
+     *
+     * @param username the username.
+     * @return the output message.
+     */
     public static String deleteUser(final String username) {
         User deleteUser = Admin.getUser(username);
         if (deleteUser == null) {
@@ -294,7 +325,8 @@ public final class Admin {
         }
         for (User user : users) {
             if (user.getUserType().equals(Enums.UserType.NORMAL)) {
-                if (user.getSelectedCreator() != null && user.getSelectedCreator().equals(username)) {
+                if (user.getSelectedCreator() != null
+                    && user.getSelectedCreator().equals(username)) {
                     return username + " can't be deleted.";
                 }
                 if (!checkArtistAlbumsDelete(user, deleteUser)) {
@@ -311,19 +343,32 @@ public final class Admin {
         switch (deleteUser.getUserType()) {
             case ARTIST -> deleteSongsArtist((Artist) deleteUser);
             case NORMAL -> deleteFollowedPlaylistsUser(deleteUser);
-            default -> {}
+            default -> {
+
+            }
         }
         users.remove(deleteUser);
         return username + " was successfully deleted.";
     }
 
-    private static boolean checkArtistAlbumsDelete(User crtUser, User artist) {
+    /**
+     * Check if an artist can be deleted.
+     * Checks if the albums of an artist or any song of theirs isn't currently
+     * playing for a specific user.
+     * Also checks if any song from the artist isn't in the playlists of a specific user.
+     *
+     * @param crtUser user which the sources come from.
+     * @param artist artist to be deleted.
+     * @return true if the artist can be deleted safely.
+     */
+    private static boolean checkArtistAlbumsDelete(final User crtUser, final User artist) {
         String sourceCollectionName = null;
         String sourceFileName = null;
 
         if (crtUser.getPlayer().getSource() != null) {
             if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
-                sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                sourceCollectionName = crtUser.getPlayer().getSource().
+                                                getAudioCollection().getName();
             }
             if (crtUser.getPlayer().getSource().getAudioFile() != null) {
                 sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
@@ -356,13 +401,22 @@ public final class Admin {
         return true;
     }
 
-    private static boolean checkUsersPlaylistsDelete(User crtUser, User deleteUser) {
+    /**
+     * Check if a normal user can be deleted.
+     * Checks if the playlists of the user aren't currently playing for a specific user
+     *
+     * @param crtUser user to check this for.
+     * @param deleteUser user to be deleted.
+     * @return true if the user can be deleted safely.
+     */
+    private static boolean checkUsersPlaylistsDelete(final User crtUser, final User deleteUser) {
         String sourceCollectionName = null;
         String sourceFileName = null;
 
         if (crtUser.getPlayer().getSource() != null) {
             if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
-                sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                sourceCollectionName = crtUser.getPlayer().getSource().
+                                                getAudioCollection().getName();
             }
             if (crtUser.getPlayer().getSource().getAudioFile() != null) {
                 sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
@@ -383,13 +437,23 @@ public final class Admin {
         return true;
     }
 
-    private static boolean checkHostPodcastsDelete(User crtUser, User host) {
+    /**
+     * Check if a host can be deleted.
+     * Checks if the podcasts of the host or any episodes from these podcast aren't currently
+     * playing for a specific user.
+     *
+     * @param crtUser user to check this for.
+     * @param host host to be deleted.
+     * @return true if the host can be deleted safely.
+     */
+    private static boolean checkHostPodcastsDelete(final User crtUser, final User host) {
         String sourceCollectionName = null;
         String sourceFileName = null;
 
         if (crtUser.getPlayer().getSource() != null) {
             if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
-                sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                sourceCollectionName = crtUser.getPlayer().getSource().
+                                                getAudioCollection().getName();
             }
             if (crtUser.getPlayer().getSource().getAudioFile() != null) {
                 sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
@@ -414,27 +478,48 @@ public final class Admin {
         return true;
     }
 
-    private static void deleteSongsArtist(Artist artist) {
+    /**
+     * Delete the songs of an artist.
+     *
+     * @param artist the artist.
+     */
+    private static void deleteSongsArtist(final Artist artist) {
         for (Album album : artist.getAlbums()) {
             songs.removeAll(album.getSongs());
             for (User user : users) {
                 user.getLikedSongs().removeAll(album.getSongs());
-                // TODO: maybe have to remove songs from playlist idk
             }
         }
     }
 
-    private static void deleteFollowedPlaylistsUser(User deletedUser) {
+    /**
+     * Delete the playlist of a user that will be deleted from all the places where it was followed.
+     *
+     * @param deletedUser the deleted user.
+     */
+    private static void deleteFollowedPlaylistsUser(final User deletedUser) {
         for (User user : users) {
-            user.getFollowedPlaylists().removeIf(playlist -> playlist.getOwner().equals(deletedUser.getUsername()));
+            user.getFollowedPlaylists().removeIf(playlist -> playlist.getOwner().
+                                                                equals(deletedUser.getUsername()));
         }
         for (Playlist playlist : deletedUser.getFollowedPlaylists()) {
             playlist.decreaseFollowers();
         }
     }
 
-    public static String addAlbum(final User user, final String name, final Integer releaseYear,
-                                  final String description, final ArrayList<SongInput> songInputs) {
+    /**
+     * Add album.
+     *
+     * @param user the user
+     * @param name the name
+     * @param releaseYear the year
+     * @param description the description
+     * @param songInputs the songs
+     * @return the output message
+     */
+    public static String addAlbum(final User user, final String name,
+                                  final Integer releaseYear, final String description,
+                                  final ArrayList<SongInput> songInputs) {
         if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
             return user.getUsername() + " is not an artist.";
         }
@@ -452,7 +537,8 @@ public final class Admin {
                     return user.getUsername() + " has the same song at least twice in this album.";
                 }
             }
-            albumSongs.add(new Song(songInput.getName(), songInput.getDuration(), songInput.getAlbum(),
+            albumSongs.add(new Song(songInput.getName(), songInput.getDuration(),
+                           songInput.getAlbum(),
                            songInput.getTags(), songInput.getLyrics(), songInput.getGenre(),
                            songInput.getReleaseYear(), songInput.getArtist()));
         }
@@ -460,7 +546,13 @@ public final class Admin {
         return ((Artist) user).addAlbum(name, releaseYear, description, albumSongs);
     }
 
-    public static String removeAlbum(final User user, String name) {
+    /**
+     * Remove album
+     * @param user the user
+     * @param name the name
+     * @return the output message.
+     */
+    public static String removeAlbum(final User user, final String name) {
         if (!user.getUserType().equals(Enums.UserType.ARTIST)) {
             return user.getUsername() + " is not an artist.";
         }
@@ -475,7 +567,6 @@ public final class Admin {
                 songs.removeAll(albumRemove.getSongs());
                 for (User userIter : users) {
                     userIter.getLikedSongs().removeAll(albumRemove.getSongs());
-                    // TODO: maybe have to remove songs from playlist idk
                 }
             }
         }
@@ -486,13 +577,21 @@ public final class Admin {
         return artist.getUsername() + " deleted the album successfully.\n";
     }
 
-    private static boolean checkAlbumDelete(Album albumRemove) {
+    /**
+     * Check if an album can be deleted.
+     * It goes through all the users sources and check if the album of a song from it is playing.
+     *
+     * @param albumRemove the album that will be deleted.
+     * @return true if the album can be deleted safely.
+     */
+    private static boolean checkAlbumDelete(final Album albumRemove) {
         for (User crtUser : users) {
             String sourceCollectionName = null;
             String sourceFileName = null;
             if (crtUser.getPlayer().getSource() != null) {
                 if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
-                    sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                    sourceCollectionName = crtUser.getPlayer().getSource().
+                                                    getAudioCollection().getName();
                 }
                 if (crtUser.getPlayer().getSource().getAudioFile() != null) {
                     sourceFileName = crtUser.getPlayer().getSource().getAudioFile().getName();
@@ -520,7 +619,16 @@ public final class Admin {
         return true;
     }
 
-    public static String addPodcast(final User user, final String name, final ArrayList<EpisodeInput> episodeInputs) {
+    /**
+     * Add podcast
+     *
+     * @param user the user
+     * @param name the name
+     * @param episodeInputs the episodes
+     * @return the output message
+     */
+    public static String addPodcast(final User user, final String name,
+                                    final ArrayList<EpisodeInput> episodeInputs) {
         if (!user.getUserType().equals(Enums.UserType.HOST)) {
             return user.getUsername() + " is not a host.";
         }
@@ -531,7 +639,8 @@ public final class Admin {
                     return user.getUsername() + " has the same episode in this podcast.";
                 }
             }
-            podcastEpisodes.add(new Episode(episodeInput.getName(), episodeInput.getDuration(), episodeInput.getDescription()));
+            podcastEpisodes.add(new Episode(episodeInput.getName(), episodeInput.getDuration(),
+                                            episodeInput.getDescription()));
         }
         Podcast podcastNew = new Podcast(name, user.getUsername(), podcastEpisodes);
         String message = ((Host) user).addPodcast(podcastNew);
@@ -541,6 +650,13 @@ public final class Admin {
         return message;
     }
 
+    /**
+     * Remove podcast.
+     *
+     * @param user the user
+     * @param name the name
+     * @return the output message
+     */
     public static String removePodcast(final User user, final String name) {
         if (!user.getUserType().equals(Enums.UserType.HOST)) {
             return user.getUsername() + " is not a host.";
@@ -563,14 +679,21 @@ public final class Admin {
         return host.getUsername() + " deleted the podcast successfully.";
     }
 
-    private static boolean checkPodcastDelete(Podcast podcastRemove) {
+    /**
+     * Check if a podcast can be deleted.
+     * It goes through all the users sources and check if the podcast is playing.
+     *
+     * @param podcastRemove the podcast that will be deleted.
+     * @return true if the podcast can be deleted safely.
+     */
+    private static boolean checkPodcastDelete(final Podcast podcastRemove) {
         for (User crtUser : users) {
             String sourceCollectionName = null;
             if (crtUser.getPlayer().getSource() != null) {
                 if (crtUser.getPlayer().getSource().getAudioCollection() != null) {
-                    sourceCollectionName = crtUser.getPlayer().getSource().getAudioCollection().getName();
+                    sourceCollectionName = crtUser.getPlayer().getSource().
+                                                getAudioCollection().getName();
                 }
-
             }
 
             if (podcastRemove.getName().equals(sourceCollectionName)) {

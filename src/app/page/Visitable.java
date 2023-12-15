@@ -1,5 +1,11 @@
 package app.page;
 
 public interface Visitable {
-    public String accept(Visitor visitor);
+    /**
+     * Accept visitor.
+     *
+     * @param visitor the visitor.
+     * @return the string.
+     */
+    String accept(Visitor visitor);
 }
