@@ -6,6 +6,7 @@ import app.audio.Collections.Podcast;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.page.PageManager;
+import app.user.Monetization;
 import app.user.artist.Artist;
 import app.user.host.Host;
 import app.user.User;
@@ -16,10 +17,7 @@ import fileio.input.SongInput;
 import fileio.input.UserInput;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Comparator;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * The type Admin.
@@ -31,6 +29,7 @@ public final class Admin {
     private static List<Podcast> podcasts = new ArrayList<>();
     private static int timestamp = 0;
     private static final int LIMIT = 5;
+    private static Map<String, Monetization> monetization = new HashMap<>();
 
     private Admin() {
     }
@@ -137,6 +136,15 @@ public final class Admin {
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 return user;
+            }
+        }
+        return null;
+    }
+
+    public static Song getSong(final String name) {
+        for (Song song : songs) {
+            if (song.getName().equals(name)) {
+                return song;
             }
         }
         return null;
@@ -703,6 +711,20 @@ public final class Admin {
         return true;
     }
 
+    public static Map<String, Monetization> getMonetizationRanking() {
+        List<Artist> artists = new ArrayList<>();
+        for (User user : users) {
+            if (user.getUserType().equals(Enums.UserType.ARTIST) && ((Artist) user).getArtistWrapped().getListeners() > 0 && !((Artist) user).getArtistWrapped().getTopAlbums().isEmpty()) {
+                artists.add((Artist) user);
+            }
+        }
+        artists.sort(Comparator.comparing(User::getUsername));
+        for (Artist artist : artists) {
+            monetization.put(artist.getUsername(), new Monetization(artists.indexOf(artist) + 1));
+        }
+        return monetization;
+    }
+
     /**
      * Reset.
      */
@@ -710,6 +732,7 @@ public final class Admin {
         users = new ArrayList<>();
         songs = new ArrayList<>();
         podcasts = new ArrayList<>();
+        monetization = new HashMap<>();
         PageManager.reset();
         timestamp = 0;
     }

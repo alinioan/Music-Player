@@ -10,6 +10,8 @@ import app.player.Player;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
+import app.user.wrapped.UserWrapped;
+import app.user.wrapped.Wrapped;
 import app.utils.Enums;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +49,8 @@ public class User implements Comparable<User> {
     private Enums.UserType userType;
     @Getter @Setter
     private String currentPage;
+    @Getter @Setter
+    private boolean premium;
 
     /**
      * Instantiates a new normal User.
@@ -536,6 +540,10 @@ public class User implements Comparable<User> {
         connectionStatus = !connectionStatus;
         player.setConnectionStatus(connectionStatus);
         return username + " has changed status successfully.";
+    }
+
+    public Wrapped getWrapped() {
+        return player.getWrapped().getSortedWrapped();
     }
 
     /**

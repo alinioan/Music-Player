@@ -26,6 +26,7 @@ public final class CommandInput {
     private Integer price;
     private ArrayList<EpisodeInput> episodes;
     private String nextPage;
+    private String recommendationType;
 
     public CommandInput() {
     }

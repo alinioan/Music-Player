@@ -1,8 +1,10 @@
 package app.player;
 
 import app.audio.Collections.AudioCollection;
+import app.audio.Collections.Playlist;
 import app.audio.Files.AudioFile;
 import app.audio.LibraryEntry;
+import app.user.wrapped.UserWrapped;
 import app.utils.Enums;
 import lombok.Getter;
 
@@ -22,6 +24,8 @@ public final class Player {
     private String type;
     private final int skipTime = 90;
     private boolean connectionStatus;
+    @Getter
+    private UserWrapped wrapped;
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
@@ -33,6 +37,7 @@ public final class Player {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.paused = true;
         this.connectionStatus = true;
+        this.wrapped = new UserWrapped();
     }
 
     /**
@@ -105,6 +110,12 @@ public final class Player {
             bookmarkPodcast();
         }
 
+        if (sourceType.equals("song")) {
+            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY);
+        }
+        if (sourceType.equals("playlist") || sourceType.equals("album")) {
+            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST);
+        }
         this.type = sourceType;
         this.source = createSource(sourceType, entry, bookmarks);
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
@@ -180,7 +191,7 @@ public final class Player {
                 }
             }
             if (!paused) {
-                source.skip(-elapsedTime);
+                source.skip(-elapsedTime, wrapped);
             }
         }
     }
@@ -189,7 +200,7 @@ public final class Player {
      * Next.
      */
     public void next() {
-        paused = source.setNextAudioFile(repeatMode, shuffle);
+        paused = source.setNextAudioFile(repeatMode, shuffle, wrapped);
         if (repeatMode == Enums.RepeatMode.REPEAT_ONCE) {
             repeatMode = Enums.RepeatMode.NO_REPEAT;
         }
@@ -203,12 +214,12 @@ public final class Player {
      * Prev.
      */
     public void prev() {
-        source.setPrevAudioFile(shuffle);
+        source.setPrevAudioFile(shuffle, wrapped);
         paused = false;
     }
 
     private void skip(final int duration) {
-        source.skip(duration);
+        source.skip(duration, wrapped);
         paused = false;
     }
 

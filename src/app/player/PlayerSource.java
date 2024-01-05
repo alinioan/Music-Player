@@ -2,6 +2,7 @@ package app.player;
 
 import app.audio.Collections.AudioCollection;
 import app.audio.Files.AudioFile;
+import app.user.wrapped.UserWrapped;
 import app.utils.Enums;
 import lombok.Getter;
 
@@ -87,7 +88,8 @@ public class PlayerSource {
      * @return the next audio file
      */
     public boolean setNextAudioFile(final Enums.RepeatMode repeatMode,
-                                    final boolean shuffle) {
+                                    final boolean shuffle,
+                                    final UserWrapped wrapped) {
         boolean isPaused = false;
 
         if (type == Enums.PlayerSourceType.LIBRARY) {
@@ -111,7 +113,7 @@ public class PlayerSource {
                         indexShuffled++;
 
                         index = indices.get(indexShuffled);
-                        updateAudioFile();
+                        updateAudioFile(wrapped);
                         remainedDuration = audioFile.getDuration();
                     }
                 } else {
@@ -120,7 +122,7 @@ public class PlayerSource {
                         isPaused = true;
                     } else {
                         index++;
-                        updateAudioFile();
+                        updateAudioFile(wrapped);
                         remainedDuration = audioFile.getDuration();
                     }
                 }
@@ -131,7 +133,7 @@ public class PlayerSource {
                 } else {
                     index = (index + 1) % audioCollection.getNumberOfTracks();
                 }
-                updateAudioFile();
+                updateAudioFile(wrapped);
                 remainedDuration = audioFile.getDuration();
             }
         }
@@ -144,7 +146,7 @@ public class PlayerSource {
      *
      * @param shuffle the shuffle
      */
-    public void setPrevAudioFile(final boolean shuffle) {
+    public void setPrevAudioFile(final boolean shuffle, UserWrapped wrapped) {
         if (type == Enums.PlayerSourceType.LIBRARY) {
             remainedDuration = audioFile.getDuration();
         } else {
@@ -156,13 +158,13 @@ public class PlayerSource {
                         indexShuffled--;
                     }
                     index = indices.get(indexShuffled);
-                    updateAudioFile();
+                    updateAudioFile(wrapped);
                     remainedDuration = audioFile.getDuration();
                 } else {
                     if (index > 0) {
                         index--;
                     }
-                    updateAudioFile();
+                    updateAudioFile(wrapped);
                     remainedDuration = audioFile.getDuration();
                 }
             }
@@ -200,19 +202,20 @@ public class PlayerSource {
      *
      * @param duration the duration
      */
-    public void skip(final int duration) {
+    public void skip(final int duration, UserWrapped wrapped) {
         remainedDuration += duration;
         if (remainedDuration > audioFile.getDuration()) {
             remainedDuration = 0;
             index++;
-            updateAudioFile();
+            updateAudioFile(wrapped);
         } else if (remainedDuration < 0) {
             remainedDuration = 0;
         }
     }
 
-    private void updateAudioFile() {
+    private void updateAudioFile(UserWrapped wrapped) {
         setAudioFile(audioCollection.getTrackByIndex(index));
+        wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType());
     }
 
     /**

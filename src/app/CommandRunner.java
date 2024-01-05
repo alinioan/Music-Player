@@ -6,9 +6,12 @@ import app.audio.Collections.PodcastOutput;
 import app.page.PageManager;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
+import app.user.Monetization;
+import app.user.wrapped.UserWrapped;
 import app.user.artist.Artist;
 import app.user.User;
 import app.user.host.Host;
+import app.user.wrapped.Wrapped;
 import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,6 +19,7 @@ import fileio.input.CommandInput;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The type Command runner.
@@ -972,6 +976,44 @@ public final class CommandRunner {
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode wrapped(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUserNull(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        Wrapped wrapped = user.getWrapped();
+
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        if (user.getUserType().equals(Enums.UserType.NORMAL)) {
+            UserWrapped userWrapped = (UserWrapped) wrapped;
+            if ((userWrapped.getTopArtists().isEmpty() && userWrapped.getTopSongs().isEmpty()
+                && userWrapped.getTopAlbums().isEmpty() && userWrapped.getTopEpisodes().isEmpty()
+                && userWrapped.getTopGenres().isEmpty())) {
+                objectNode.put("message", "No data to show for user " + user.getUsername() + ".");
+            } else {
+                objectNode.put("result", objectMapper.valueToTree(wrapped));
+            }
+        } else {
+            objectNode.put("result", objectMapper.valueToTree(wrapped));
+        }
+        return objectNode;
+    }
+
+    public static ObjectNode endProgram() {
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        Map<String, Monetization> monetization = Admin.getMonetizationRanking();
+
+        objectNode.put("command", "endProgram");
+        objectNode.put("result", objectMapper.valueToTree(monetization));
+
         return objectNode;
     }
 }

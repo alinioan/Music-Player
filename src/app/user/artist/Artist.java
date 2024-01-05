@@ -1,9 +1,13 @@
 package app.user.artist;
 
+import app.Admin;
 import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Files.Song;
 import app.user.User;
+import app.user.wrapped.ArtistWrapped;
+import app.user.wrapped.UserWrapped;
+import app.user.wrapped.Wrapped;
 import app.utils.Enums;
 import lombok.Getter;
 
@@ -14,6 +18,7 @@ public class Artist extends User {
     private ArrayList<Album> albums;
     private ArrayList<Event> events;
     private ArrayList<Merch> merches;
+    private ArtistWrapped artistWrapped;
 
     /**
      * Instantiates a new User.
@@ -30,6 +35,7 @@ public class Artist extends User {
         albums = new ArrayList<>();
         events = new ArrayList<>();
         merches = new ArrayList<>();
+        artistWrapped = new ArtistWrapped();
     }
 
     /**
@@ -177,4 +183,21 @@ public class Artist extends User {
         return likes;
     }
 
+    public Album getAlbum(final String name) {
+        for (Album album : albums) {
+            if (album.getName().equals(name)) {
+                return album;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Wrapped getWrapped() {
+        for (User user : Admin.getUsers()) {
+            UserWrapped userWrapped = user.getPlayer().getWrapped();
+            artistWrapped.updateStats(userWrapped, this, user.getUsername());
+        }
+        return artistWrapped.getSortedWrapped();
+    }
 }

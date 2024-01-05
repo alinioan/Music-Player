@@ -82,6 +82,9 @@ public final class Main {
         Admin.setSongs(library.getSongs());
         Admin.setPodcasts(library.getPodcasts());
 
+//        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02"))
+//            return;
+
         for (CommandInput command : commands) {
             Admin.updateTimestamp(command.getTimestamp());
 
@@ -131,10 +134,11 @@ public final class Main {
                 case "changePage" -> outputs.add(CommandRunner.changePage(command));
                 case "getAllUsers" -> outputs.add(CommandRunner.getAllUsers(command));
                 case "getOnlineUsers" -> outputs.add(CommandRunner.getOnlineUsers(command));
+                case "wrapped" -> outputs.add(CommandRunner.wrapped(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }
-
+        outputs.add(CommandRunner.endProgram());
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), outputs);
 
