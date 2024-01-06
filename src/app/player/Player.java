@@ -7,6 +7,7 @@ import app.audio.LibraryEntry;
 import app.user.wrapped.UserWrapped;
 import app.utils.Enums;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public final class Player {
     private boolean connectionStatus;
     @Getter
     private UserWrapped wrapped;
+    private boolean premium;
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
@@ -33,11 +35,12 @@ public final class Player {
     /**
      * Instantiates a new Player.
      */
-    public Player() {
+    public Player(boolean premium) {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.paused = true;
         this.connectionStatus = true;
         this.wrapped = new UserWrapped();
+        this.premium = premium;
     }
 
     /**
@@ -73,30 +76,30 @@ public final class Player {
      * @param bookmarks the bookmarks
      * @return the player source
      */
-    public static PlayerSource createSource(final String type,
+    public PlayerSource createSource(final String type,
                                             final LibraryEntry entry,
                                             final List<PodcastBookmark> bookmarks) {
         if ("song".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry);
+            return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry, premium);
         } else if ("playlist".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry);
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium);
         } else if ("podcast".equals(type)) {
             return createPodcastSource((AudioCollection) entry, bookmarks);
         } else if ("album".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry);
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium);
         }
 
         return null;
     }
 
-    private static PlayerSource createPodcastSource(final AudioCollection collection,
+    private PlayerSource createPodcastSource(final AudioCollection collection,
                                                     final List<PodcastBookmark> bookmarks) {
         for (PodcastBookmark bookmark : bookmarks) {
             if (bookmark.getName().equals(collection.getName())) {
                 return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, bookmark);
             }
         }
-        return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection);
+        return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, premium);
     }
 
     /**
@@ -111,10 +114,10 @@ public final class Player {
         }
 
         if (sourceType.equals("song")) {
-            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY);
+            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY, premium);
         }
         if (sourceType.equals("playlist") || sourceType.equals("album")) {
-            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST);
+            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST, premium);
         }
         this.type = sourceType;
         this.source = createSource(sourceType, entry, bookmarks);
@@ -305,5 +308,12 @@ public final class Player {
         }
 
         return new PlayerStats(filename, duration, repeatMode, shuffle, paused);
+    }
+
+    public void setPremium(boolean premium) {
+        this.premium = premium;
+        if (source != null) {
+            source.setPremium(premium);
+        }
     }
 }

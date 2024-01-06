@@ -66,7 +66,8 @@ public class User implements Comparable<User> {
         playlists = new ArrayList<>();
         likedSongs = new ArrayList<>();
         followedPlaylists = new ArrayList<>();
-        player = new Player();
+        premium = false;
+        player = new Player(premium);
         searchBar = new SearchBar(username);
         lastSearched = false;
         this.connectionStatus = true;
@@ -544,6 +545,24 @@ public class User implements Comparable<User> {
 
     public Wrapped getWrapped() {
         return player.getWrapped().getSortedWrapped();
+    }
+
+    public String buyPremium() {
+        if (isPremium()) {
+            return username + " is already a premium user.";
+        }
+        premium = true;
+        player.setPremium(premium);
+        return username + " bought the subscription successfully.";
+    }
+
+    public String cancelPremium() {
+        if (!isPremium()) {
+            return username + " is not a premium user.";
+        }
+        premium = false;
+        player.setPremium(premium);
+        return username + " cancelled the subscription successfully.";
     }
 
     /**

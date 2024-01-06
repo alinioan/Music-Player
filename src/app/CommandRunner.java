@@ -7,6 +7,7 @@ import app.page.PageManager;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.user.Monetization;
+import app.user.wrapped.ArtistWrapped;
 import app.user.wrapped.UserWrapped;
 import app.user.artist.Artist;
 import app.user.User;
@@ -1000,9 +1001,45 @@ public final class CommandRunner {
             } else {
                 objectNode.put("result", objectMapper.valueToTree(wrapped));
             }
-        } else {
-            objectNode.put("result", objectMapper.valueToTree(wrapped));
+        } else if (user.getUserType().equals(Enums.UserType.ARTIST)) {
+            ArtistWrapped artistWrapped = (ArtistWrapped) wrapped;
+            if ((artistWrapped.getListeners() == 0 && artistWrapped.getTopSongs().isEmpty()
+                    && artistWrapped.getTopAlbums().isEmpty() && artistWrapped.getTopFans().isEmpty())) {
+                objectNode.put("message", "No data to show for artist " + user.getUsername() + ".");
+            } else {
+                objectNode.put("result", objectMapper.valueToTree(wrapped));
+            }
         }
+        return objectNode;
+    }
+
+    public static ObjectNode buyPremium(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        String message = user.buyPremium();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode cancelPremium(final CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        String message = user.cancelPremium();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
         return objectNode;
     }
 

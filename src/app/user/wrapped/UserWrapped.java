@@ -22,6 +22,8 @@ public class UserWrapped implements Wrapped {
     private Map<StringPair, Integer> topAlbumsWithArtist;
     @JsonIgnore
     private Map<StringPair, Integer> topSongsWithArtist;
+    @JsonIgnore
+    private Map<StringPair, Integer> topSongsWithArtistPremium;
     private Map<String, Integer> topEpisodes;
 
     public UserWrapped() {
@@ -31,6 +33,7 @@ public class UserWrapped implements Wrapped {
         topAlbums = new HashMap<>();
         topAlbumsWithArtist = new HashMap<>();
         topSongsWithArtist = new HashMap<>();
+        topSongsWithArtistPremium = new HashMap<>();
         topEpisodes = new HashMap<>();
     }
 
@@ -41,6 +44,7 @@ public class UserWrapped implements Wrapped {
         this.topAlbums= wrapped.getTopAlbums();
         this.topAlbumsWithArtist = wrapped.getTopAlbumsWithArtist();
         this.topSongsWithArtist = wrapped.getTopSongsWithArtist();
+        topSongsWithArtistPremium = wrapped.getTopSongsWithArtistPremium();
         this.topSongs = wrapped.getTopSongs();
     }
 
@@ -77,46 +81,22 @@ public class UserWrapped implements Wrapped {
         return sortedMap;
     }
 
-    public void updateStats(AudioFile file, Enums.PlayerSourceType type) {
+    public void updateStats(AudioFile file, Enums.PlayerSourceType type, boolean premium) {
         switch (type) {
             case LIBRARY, PLAYLIST -> {
                 Song song = (Song) file;
-                if (topSongs.containsKey(song.getName())) {
-                    topSongs.put(song.getName(), topSongs.get(song.getName()) + 1);
-                } else {
-                    topSongs.put(song.getName(), 1);
-                }
-
-                if (topGenres.containsKey(song.getGenre())) {
-                    topGenres.put(song.getGenre(), topGenres.get(song.getGenre()) + 1);
-                } else {
-                    topGenres.put(song.getGenre(), 1);
-                }
-
-                if (topArtists.containsKey(song.getArtist())) {
-                    topArtists.put(song.getArtist(), topArtists.get(song.getArtist()) + 1);
-                } else {
-                    topArtists.put(song.getArtist(), 1);
-                }
-
-                if (topAlbums.containsKey(song.getAlbum())) {
-                    topAlbums.put(song.getAlbum(), topAlbums.get(song.getAlbum()) + 1);
-                } else {
-                    topAlbums.put(song.getAlbum(), 1);
-                }
+                updateMap(topSongs, song.getName());
+                updateMap(topGenres, song.getGenre());
+                updateMap(topArtists, song.getArtist());
+                updateMap(topAlbums, song.getAlbum());
 
                 StringPair pairAlbum = new StringPair(song.getAlbum(), song.getArtist());
-                if (topAlbumsWithArtist.containsKey(pairAlbum)) {
-                    topAlbumsWithArtist.put(pairAlbum, topAlbumsWithArtist.get(pairAlbum) + 1);
-                } else {
-                    topAlbumsWithArtist.put(pairAlbum, 1);
-                }
+                updateMap(topAlbumsWithArtist, pairAlbum);
 
                 StringPair pairSong = new StringPair(song.getName(), song.getArtist());
-                if (topSongsWithArtist.containsKey(pairSong)) {
-                    topSongsWithArtist.put(pairSong, topSongsWithArtist.get(pairSong) + 1);
-                } else {
-                    topSongsWithArtist.put(pairSong, 1);
+                updateMap(topSongsWithArtist, pairSong);
+                if (premium) {
+                    updateMap(topSongsWithArtistPremium, pairSong);
                 }
 
             }
@@ -134,14 +114,25 @@ public class UserWrapped implements Wrapped {
         }
     }
 
+    private <K> void updateMap(Map<K, Integer> map, K key) {
+        if (map.containsKey(key)) {
+            map.put(key, map.get(key) + 1);
+        } else {
+            map.put(key, 1);
+        }
+    }
+
     @Override
     public String toString() {
-        return "Wrapped{" +
-                "topArtis=" + topArtists +
-                ", topGenres=" + topGenres +
-                ", topSongs=" + topSongs +
-                ", topAlbums=" + topAlbums +
-                ", topEpisodes=" + topEpisodes +
+        return "UserWrapped{" +
+//                "topArtists=" + topArtists +
+//                ", topGenres=" + topGenres +
+//                ", topSongs=" + topSongs +
+//                ", topAlbums=" + topAlbums +
+//                ", topAlbumsWithArtist=" + topAlbumsWithArtist +
+//                ", topSongsWithArtist=" + topSongsWithArtist +
+                ", topSongsWithArtistPremium=" + topSongsWithArtistPremium +
+//                ", topEpisodes=" + topEpisodes +
                 '}';
     }
 }

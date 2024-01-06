@@ -82,8 +82,8 @@ public final class Main {
         Admin.setSongs(library.getSongs());
         Admin.setPodcasts(library.getPodcasts());
 
-//        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02"))
-//            return;
+        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02") && !filePath1.contains("03") && !filePath1.contains("04"))
+            return;
 
         for (CommandInput command : commands) {
             Admin.updateTimestamp(command.getTimestamp());
@@ -135,6 +135,8 @@ public final class Main {
                 case "getAllUsers" -> outputs.add(CommandRunner.getAllUsers(command));
                 case "getOnlineUsers" -> outputs.add(CommandRunner.getOnlineUsers(command));
                 case "wrapped" -> outputs.add(CommandRunner.wrapped(command));
+                case "buyPremium" -> outputs.add(CommandRunner.buyPremium(command));
+                case "cancelPremium" -> outputs.add(CommandRunner.cancelPremium(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

@@ -10,7 +10,9 @@ import app.user.Monetization;
 import app.user.artist.Artist;
 import app.user.host.Host;
 import app.user.User;
+import app.user.wrapped.UserWrapped;
 import app.utils.Enums;
+import app.utils.StringPair;
 import fileio.input.EpisodeInput;
 import fileio.input.PodcastInput;
 import fileio.input.SongInput;
@@ -29,6 +31,8 @@ public final class Admin {
     private static List<Podcast> podcasts = new ArrayList<>();
     private static int timestamp = 0;
     private static final int LIMIT = 5;
+    private static final double VALUE = 1000000.0;
+    private static final double HOUNDRED = 100.0;
     private static Map<String, Monetization> monetization = new HashMap<>();
 
     private Admin() {
@@ -712,17 +716,112 @@ public final class Admin {
     }
 
     public static Map<String, Monetization> getMonetizationRanking() {
-        List<Artist> artists = new ArrayList<>();
+        Map<StringPair, Double> totalSongEarnings = new HashMap<>();
         for (User user : users) {
-            if (user.getUserType().equals(Enums.UserType.ARTIST) && ((Artist) user).getArtistWrapped().getListeners() > 0 && !((Artist) user).getArtistWrapped().getTopAlbums().isEmpty()) {
-                artists.add((Artist) user);
+            if (user.getUserType().equals(Enums.UserType.NORMAL)) {
+
+                UserWrapped userWrapped = user.getPlayer().getWrapped();
+//                double totalSongs = userWrapped.getTopSongsWithArtistPremium().size();
+                List<String> checkedArtists = new ArrayList<>();
+
+                for (Map.Entry<StringPair, Integer> entry1 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
+                    double artistListens = 0.0;
+                    double totalSongs = 0.0;
+                    for (Map.Entry<StringPair, Integer> entry2 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
+                        totalSongs += entry2.getValue();
+                    }
+
+                    for (Map.Entry<StringPair, Integer> entry2 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
+                        if (!checkedArtists.contains(entry2.getKey().getS2()) && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
+                            artistListens += entry2.getValue();
+                            Double revenue =  entry2.getValue() * VALUE / totalSongs;
+                            if (totalSongEarnings.containsKey(entry2.getKey())) {
+                                totalSongEarnings.put(entry2.getKey(), revenue + totalSongEarnings.get(entry2.getKey()));
+                            } else {
+                                totalSongEarnings.put(entry2.getKey(), revenue);
+                            }
+                        }
+                    }
+                    checkedArtists.add(entry1.getKey().getS2());
+                    addNewMonetization(artistListens, totalSongs, entry1.getKey().getS2());
+                }
+                if (userWrapped.getTopSongsWithArtistPremium().isEmpty()) {
+                    for (Map.Entry<String, Integer> entry : userWrapped.getTopArtists().entrySet()) {
+                        if (!monetization.containsKey(entry.getKey())) {
+                            monetization.put(entry.getKey(), new Monetization(0.0, "N/A", 0.0));
+                        }
+                    }
+                }
             }
         }
-        artists.sort(Comparator.comparing(User::getUsername));
-        for (Artist artist : artists) {
-            monetization.put(artist.getUsername(), new Monetization(artists.indexOf(artist) + 1));
-        }
+        System.out.println(totalSongEarnings);
+        setMostProfitableSongs(totalSongEarnings);
+        roundMonetization();
+        sortMonetization();
         return monetization;
+    }
+
+    private static void addNewMonetization(double artistListens, double totalSongs, String artist) {
+        double songRevenue = artistListens * VALUE / totalSongs;
+        if (monetization.containsKey(artist)) {
+            Monetization newMonetization = monetization.get(artist);
+            newMonetization.setSongRevenue(newMonetization.getSongRevenue() + songRevenue);
+            monetization.put(artist, newMonetization);
+        } else {
+            monetization.put(artist, new Monetization(0.0, songRevenue));
+        }
+    }
+
+    private static void setMostProfitableSongs(Map<StringPair, Double> totalSongEarnings) {
+        List<String> checkedArtists = new ArrayList<>();
+
+        for (Map.Entry<StringPair, Double> entry1 : totalSongEarnings.entrySet()) {
+            double revenue = 0.0;
+            String topSong = null;
+
+            for (Map.Entry<StringPair, Double> entry2 : totalSongEarnings.entrySet()) {
+                if (!checkedArtists.contains(entry2.getKey().getS2()) && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
+                    if (entry2.getValue() > revenue) {
+                        revenue = entry2.getValue();
+                        topSong = entry2.getKey().getS1();
+                    } else if(entry2.getValue() == revenue && topSong.compareTo(entry2.getKey().getS1()) > 0) {
+                        topSong = entry2.getKey().getS1();
+                    }
+                }
+            }
+
+            if (topSong != null) {
+                Monetization newMonetization = monetization.get(entry1.getKey().getS2());
+                newMonetization.setMostProfitableSong(topSong);
+                monetization.put(entry1.getKey().getS2(), newMonetization);
+            }
+            checkedArtists.add(entry1.getKey().getS2());
+        }
+    }
+
+    private static void sortMonetization() {
+        List<Map.Entry<String, Monetization>> entryList = new ArrayList<>(monetization.entrySet());
+
+        entryList.sort((entry1, entry2) -> {
+            int valueComparison = entry2.getValue().compareTo(entry1.getValue());
+            return (valueComparison == 0) ? entry1.getKey().compareTo(entry2.getKey()) : valueComparison;
+        });
+
+        Map<String, Monetization> sortedMap = new LinkedHashMap<>();
+
+        int count = 1;
+        for (Map.Entry<String, Monetization> entry : entryList) {
+            entry.getValue().setRanking(count);
+            sortedMap.put(entry.getKey(), entry.getValue());
+            count++;
+        }
+        monetization = sortedMap;
+    }
+
+    private static void roundMonetization() {
+        for (Map.Entry<String, Monetization> entry : monetization.entrySet()) {
+            entry.getValue().setSongRevenue(Math.round(entry.getValue().getSongRevenue() * HOUNDRED) / HOUNDRED);
+        }
     }
 
     /**

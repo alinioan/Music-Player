@@ -73,7 +73,7 @@ public class ArtistWrapped implements Wrapped {
                 if (topSongs.containsKey(entry.getKey().getS1())) {
                     topSongs.put(entry.getKey().getS1(), entry.getValue() + topSongs.get(entry.getKey().getS1()));
                 } else {
-                    topSongs.put(entry.getKey().getS1(), 1);
+                    topSongs.put(entry.getKey().getS1(), entry.getValue());
                 }
             }
         }
@@ -82,7 +82,7 @@ public class ArtistWrapped implements Wrapped {
                 if (topAlbums.containsKey(entry.getKey().getS1())) {
                     topAlbums.put(entry.getKey().getS1(), entry.getValue() + topAlbums.get(entry.getKey().getS1()));
                 } else {
-                    topAlbums.put(entry.getKey().getS1(), 1);
+                    topAlbums.put(entry.getKey().getS1(), entry.getValue());
                 }
             }
         }

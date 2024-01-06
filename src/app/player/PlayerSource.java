@@ -5,6 +5,7 @@ import app.audio.Files.AudioFile;
 import app.user.wrapped.UserWrapped;
 import app.utils.Enums;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,8 @@ public class PlayerSource {
     private int indexShuffled;
     private int remainedDuration;
     private final List<Integer> indices = new ArrayList<>();
+    @Getter @Setter
+    private boolean premium;
 
     /**
      * Instantiates a new Player source.
@@ -33,10 +36,11 @@ public class PlayerSource {
      * @param type      the type
      * @param audioFile the audio file
      */
-    public PlayerSource(final Enums.PlayerSourceType type, final AudioFile audioFile) {
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioFile audioFile, boolean premium) {
         this.type = type;
         this.audioFile = audioFile;
         this.remainedDuration = audioFile.getDuration();
+        this.premium = premium;
     }
 
     /**
@@ -45,13 +49,14 @@ public class PlayerSource {
      * @param type            the type
      * @param audioCollection the audio collection
      */
-    public PlayerSource(final Enums.PlayerSourceType type, final AudioCollection audioCollection) {
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioCollection audioCollection, boolean premium) {
         this.type = type;
         this.audioCollection = audioCollection;
         this.audioFile = audioCollection.getTrackByIndex(0);
         this.index = 0;
         this.indexShuffled = 0;
         this.remainedDuration = audioFile.getDuration();
+        this.premium = premium;
     }
 
     /**
@@ -215,7 +220,7 @@ public class PlayerSource {
 
     private void updateAudioFile(UserWrapped wrapped) {
         setAudioFile(audioCollection.getTrackByIndex(index));
-        wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType());
+        wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(), premium);
     }
 
     /**
