@@ -24,4 +24,13 @@ public final class ArtistPage implements Visitable {
     public String accept(final Visitor visitor) {
         return visitor.visit(this);
     }
+
+    public Merch getMerch(String merchName) {
+        for (Merch merch : merches) {
+            if (merch.getName().equals(merchName)) {
+                return merch;
+            }
+        }
+        return null;
+    }
 }

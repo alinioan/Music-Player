@@ -1043,6 +1043,55 @@ public final class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode adBreak(final CommandInput commandInput, final CommandInput nextCommand) {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+        boolean isLoad = false;
+        if (nextCommand.getCommand().equals("search")) {
+            isLoad = true;
+        }
+        String message = user.adBreak(commandInput.getPrice(), commandInput.getTimestamp(),
+                                      nextCommand.getTimestamp(), isLoad);
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode buyMerch(final CommandInput commandInput)  {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        String message = user.buyMerch(commandInput.getName());
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    public static ObjectNode seeMerch(final CommandInput commandInput)  {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        List<String> merchList = user.getOwnedMerch();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(merchList));
+        return objectNode;
+    }
+
     public static ObjectNode endProgram() {
 
         ObjectNode objectNode = objectMapper.createObjectNode();

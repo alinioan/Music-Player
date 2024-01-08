@@ -28,7 +28,8 @@ public final class Player {
     @Getter
     private UserWrapped wrapped;
     private boolean premium;
-
+    private boolean adQueued;
+    private int adPrice;
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
 
@@ -41,6 +42,7 @@ public final class Player {
         this.connectionStatus = true;
         this.wrapped = new UserWrapped();
         this.premium = premium;
+        adQueued = false;
     }
 
     /**
@@ -80,13 +82,13 @@ public final class Player {
                                             final LibraryEntry entry,
                                             final List<PodcastBookmark> bookmarks) {
         if ("song".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry, premium);
+            return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry, premium, adPrice, adQueued);
         } else if ("playlist".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium);
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium, adPrice, adQueued);
         } else if ("podcast".equals(type)) {
             return createPodcastSource((AudioCollection) entry, bookmarks);
         } else if ("album".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium);
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium, adPrice, adQueued);
         }
 
         return null;
@@ -99,7 +101,7 @@ public final class Player {
                 return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, bookmark);
             }
         }
-        return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, premium);
+        return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, premium, adPrice, adQueued);
     }
 
     /**
@@ -112,12 +114,11 @@ public final class Player {
         if ("podcast".equals(this.type)) {
             bookmarkPodcast();
         }
-
         if (sourceType.equals("song")) {
-            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY, premium);
+            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY, premium, ((AudioFile) entry).getDuration());
         }
         if (sourceType.equals("playlist") || sourceType.equals("album")) {
-            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST, premium);
+            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST, premium, ((Playlist) entry).getTrackByIndex(0).getDuration());
         }
         this.type = sourceType;
         this.source = createSource(sourceType, entry, bookmarks);
@@ -203,6 +204,9 @@ public final class Player {
      * Next.
      */
     public void next() {
+        if (source.getDuration() == 0) {
+            wrapped.updateStats(getCurrentAudioFile(), source.getType(), premium, 0);
+        }
         paused = source.setNextAudioFile(repeatMode, shuffle, wrapped);
         if (repeatMode == Enums.RepeatMode.REPEAT_ONCE) {
             repeatMode = Enums.RepeatMode.NO_REPEAT;
@@ -315,5 +319,21 @@ public final class Player {
         if (source != null) {
             source.setPremium(premium);
         }
+    }
+
+    public boolean queueAd(final int price, final int timestamp,
+                           final int nextTimestamp, final boolean isLoad) {
+        if (this.source != null) {
+//            if (isLoad && nextTimestamp - timestamp < 10) {
+                System.out.print(timestamp + " ");
+                wrapped.calculateAdRevenue(price);
+//            }
+            this.adQueued = true;
+            this.adPrice = price;
+            this.source.setAdQueued(true);
+            this.source.setAdPrice(price);
+            return true;
+        }
+        return false;
     }
 }

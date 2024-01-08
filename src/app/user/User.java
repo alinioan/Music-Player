@@ -1,15 +1,20 @@
 package app.user;
 
+import app.Admin;
 import app.audio.Collections.AudioCollection;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.PlaylistOutput;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
+import app.page.ArtistPage;
+import app.page.PageManager;
 import app.player.Player;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
+import app.user.artist.Artist;
+import app.user.artist.Merch;
 import app.user.wrapped.UserWrapped;
 import app.user.wrapped.Wrapped;
 import app.utils.Enums;
@@ -51,6 +56,8 @@ public class User implements Comparable<User> {
     private String currentPage;
     @Getter @Setter
     private boolean premium;
+    @Getter
+    private List<String> ownedMerch;
 
     /**
      * Instantiates a new normal User.
@@ -73,6 +80,7 @@ public class User implements Comparable<User> {
         this.connectionStatus = true;
         this.userType = Enums.UserType.NORMAL;
         this.currentPage = "Home";
+        this.ownedMerch = new ArrayList<>();
     }
 
     /**
@@ -140,6 +148,9 @@ public class User implements Comparable<User> {
      * @return the string
      */
     public String load() {
+        if (player.getSource() != null && player.getSource().getDuration() > 0) {
+            player.getWrapped().songOverwritten(player.getSource().getAudioFile(), player.getSource().getType(), premium);
+        }
         if (searchBar.getLastSelected() == null) {
             return "Please select a source before attempting to load.";
         }
@@ -563,6 +574,35 @@ public class User implements Comparable<User> {
         premium = false;
         player.setPremium(premium);
         return username + " cancelled the subscription successfully.";
+    }
+
+    public String adBreak(final int price, final int timestamp,
+                          final int nextTimestamp, final boolean isLoad) {
+        if (player.queueAd(price, timestamp, nextTimestamp, isLoad)) {
+            return "Ad inserted successfully.";
+        }
+        return username + " is not playing any music.";
+    }
+
+    public String buyMerch(final String merchName) {
+        ArtistPage artistPage = null;
+        if (selectedCreator != null && Admin.getUser(selectedCreator).getUserType() == Enums.UserType.ARTIST) {
+            artistPage = PageManager.getArtistPageHashMap().get(selectedCreator);
+        } else {
+            return "Cannot buy merch from this page.";
+        }
+
+        Merch merch = artistPage.getMerch(merchName);
+        if (merch != null) {
+            Artist artist = (Artist) Admin.getUser(selectedCreator);
+            artist.getArtistWrapped()
+                  .setMerchRevenue(artist.getArtistWrapped().getMerchRevenue() + merch.getPrice());
+            ownedMerch.add(merchName);
+        } else {
+            return "The merch %s doesn't exist.".formatted(merchName);
+        }
+
+        return username + " has added new merch successfully.";
     }
 
     /**

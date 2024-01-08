@@ -12,6 +12,7 @@ import java.util.HashMap;
 public final class PageManager {
     private static HashMap<String, HomePage> homePageHashMap = new HashMap<>();
     private static HashMap<String, LikedContentPage> likedContentPageHashMap = new HashMap<>();
+    @Getter
     private static HashMap<String, ArtistPage> artistPageHashMap = new HashMap<>();
     private static HashMap<String, HostPage> hostPageHashMap = new HashMap<>();
 

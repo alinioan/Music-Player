@@ -12,6 +12,11 @@ public class Monetization implements Comparable<Monetization> {
     int ranking;
     double songRevenue;
 
+    public Monetization(double merchRevenue) {
+        this.merchRevenue = merchRevenue;
+        this.mostProfitableSong = "N/A";
+    }
+
     public Monetization(double merchRevenue, double songRevenue) {
         this.merchRevenue = merchRevenue;
         this.songRevenue = songRevenue;
@@ -26,5 +31,15 @@ public class Monetization implements Comparable<Monetization> {
     @Override
     public int compareTo(Monetization monetization) {
         return Double.compare(this.songRevenue + this.merchRevenue, monetization.songRevenue + monetization.merchRevenue);
+    }
+
+    @Override
+    public String toString() {
+        return "Monetization{" +
+                "merchRevenue=" + merchRevenue +
+                ", mostProfitableSong='" + mostProfitableSong + '\'' +
+                ", ranking=" + ranking +
+                ", songRevenue=" + songRevenue +
+                '}';
     }
 }

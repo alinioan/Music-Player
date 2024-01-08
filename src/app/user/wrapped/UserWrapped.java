@@ -3,6 +3,8 @@ package app.user.wrapped;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
+import app.user.Monetization;
+import app.user.User;
 import app.utils.Enums;
 import app.utils.StringPair;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +26,12 @@ public class UserWrapped implements Wrapped {
     private Map<StringPair, Integer> topSongsWithArtist;
     @JsonIgnore
     private Map<StringPair, Integer> topSongsWithArtistPremium;
+    @JsonIgnore
+    private Map<StringPair, Integer> topSongsWithArtistFree;
+    @JsonIgnore
+    private Map<String, Monetization> adMonetization;
+    @JsonIgnore
+    private Map<StringPair, Double> freeSongRevenue;
     private Map<String, Integer> topEpisodes;
 
     public UserWrapped() {
@@ -35,6 +43,9 @@ public class UserWrapped implements Wrapped {
         topSongsWithArtist = new HashMap<>();
         topSongsWithArtistPremium = new HashMap<>();
         topEpisodes = new HashMap<>();
+        topSongsWithArtistFree = new HashMap<>();
+        freeSongRevenue = new HashMap<>();
+        adMonetization = new HashMap<>();
     }
 
     public UserWrapped(UserWrapped wrapped) {
@@ -81,7 +92,7 @@ public class UserWrapped implements Wrapped {
         return sortedMap;
     }
 
-    public void updateStats(AudioFile file, Enums.PlayerSourceType type, boolean premium) {
+    public void updateStats(AudioFile file, Enums.PlayerSourceType type, boolean premium, final int remainedDuration) {
         switch (type) {
             case LIBRARY, PLAYLIST -> {
                 Song song = (Song) file;
@@ -97,15 +108,33 @@ public class UserWrapped implements Wrapped {
                 updateMap(topSongsWithArtist, pairSong);
                 if (premium) {
                     updateMap(topSongsWithArtistPremium, pairSong);
+                } else {
+                    updateMap(topSongsWithArtistFree, pairSong);
                 }
-
             }
             case PODCAST -> {
                 Episode episode = (Episode) file;
                 if (topEpisodes.containsKey(episode.getName())) {
                     topEpisodes.put(episode.getName(), topEpisodes.get(episode.getName()) + 1);
-                } else {
+                } else if (remainedDuration == 0) {
                     topEpisodes.put(episode.getName(), 1);
+                }
+            }
+            default -> {
+
+            }
+        }
+    }
+
+    public void songOverwritten(AudioFile file, Enums.PlayerSourceType type, boolean premium) {
+        switch (type) {
+            case LIBRARY, PLAYLIST -> {
+                Song song = (Song) file;
+                StringPair pairSong = new StringPair(song.getName(), song.getArtist());
+
+                if (!premium && topSongsWithArtistFree.containsKey(pairSong)) {
+                    topSongsWithArtistFree.put(pairSong, topSongsWithArtistFree.get(pairSong) - 1);
+//                    updateMap(topSongsWithArtistFree, pairSong);
                 }
             }
             default -> {
@@ -122,17 +151,43 @@ public class UserWrapped implements Wrapped {
         }
     }
 
-    @Override
-    public String toString() {
-        return "UserWrapped{" +
-//                "topArtists=" + topArtists +
-//                ", topGenres=" + topGenres +
-//                ", topSongs=" + topSongs +
-//                ", topAlbums=" + topAlbums +
-//                ", topAlbumsWithArtist=" + topAlbumsWithArtist +
-//                ", topSongsWithArtist=" + topSongsWithArtist +
-                ", topSongsWithArtistPremium=" + topSongsWithArtistPremium +
-//                ", topEpisodes=" + topEpisodes +
-                '}';
+    public void calculateAdRevenue(int price) {
+        List<String> checkedArtists = new ArrayList<>();
+
+        for (Map.Entry<StringPair, Integer> entry1 : topSongsWithArtistFree.entrySet()) {
+            double artistListens = 0.0;
+            double totalSongs = 0.0;
+            for (Map.Entry<StringPair, Integer> entry2 : topSongsWithArtistFree.entrySet()) {
+                totalSongs += entry2.getValue();
+            }
+
+            for (Map.Entry<StringPair, Integer> entry2 : topSongsWithArtistFree.entrySet()) {
+                if (!checkedArtists.contains(entry2.getKey().getS2()) && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
+                    artistListens += entry2.getValue();
+                    Double revenue =  entry2.getValue() * price / totalSongs;
+                    if (freeSongRevenue.containsKey(entry2.getKey())) {
+                        freeSongRevenue.put(entry2.getKey(), revenue + freeSongRevenue.get(entry2.getKey()));
+                    } else {
+                        freeSongRevenue.put(entry2.getKey(), revenue);
+                    }
+                }
+            }
+            checkedArtists.add(entry1.getKey().getS2());
+            addNewMonetization(artistListens, totalSongs, entry1.getKey().getS2(), price);
+        }
+//        System.out.println(price + " " + adMonetization);
+        topSongsWithArtistFree.clear();
     }
+
+    private void addNewMonetization(double artistListens, double totalSongs, String artist, int price) {
+        double songRevenue = artistListens * price / totalSongs;
+        if (adMonetization.containsKey(artist)) {
+            Monetization newMonetization = adMonetization.get(artist);
+            newMonetization.setSongRevenue(newMonetization.getSongRevenue() + songRevenue);
+            adMonetization.put(artist, newMonetization);
+        } else {
+            adMonetization.put(artist, new Monetization(0.0, songRevenue));
+        }
+    }
+
 }

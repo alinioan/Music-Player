@@ -1,5 +1,6 @@
 package app.player;
 
+import app.Admin;
 import app.audio.Collections.AudioCollection;
 import app.audio.Files.AudioFile;
 import app.user.wrapped.UserWrapped;
@@ -29,18 +30,24 @@ public class PlayerSource {
     private final List<Integer> indices = new ArrayList<>();
     @Getter @Setter
     private boolean premium;
-
+    @Getter @Setter
+    private boolean adQueued;
+    @Setter
+    private int adPrice;
     /**
      * Instantiates a new Player source.
      *
      * @param type      the type
      * @param audioFile the audio file
      */
-    public PlayerSource(final Enums.PlayerSourceType type, final AudioFile audioFile, boolean premium) {
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioFile audioFile,
+                        final boolean premium, final int adPrice, final boolean adQueued) {
         this.type = type;
         this.audioFile = audioFile;
         this.remainedDuration = audioFile.getDuration();
         this.premium = premium;
+        this.adPrice = adPrice;
+        this.adQueued = adQueued;
     }
 
     /**
@@ -49,7 +56,8 @@ public class PlayerSource {
      * @param type            the type
      * @param audioCollection the audio collection
      */
-    public PlayerSource(final Enums.PlayerSourceType type, final AudioCollection audioCollection, boolean premium) {
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioCollection audioCollection,
+                        final boolean premium, final int adPrice, final boolean adQueued) {
         this.type = type;
         this.audioCollection = audioCollection;
         this.audioFile = audioCollection.getTrackByIndex(0);
@@ -57,6 +65,8 @@ public class PlayerSource {
         this.indexShuffled = 0;
         this.remainedDuration = audioFile.getDuration();
         this.premium = premium;
+        this.adPrice = adPrice;
+        this.adQueued = adQueued;
     }
 
     /**
@@ -101,8 +111,14 @@ public class PlayerSource {
             if (repeatMode != Enums.RepeatMode.NO_REPEAT) {
                 remainedDuration = audioFile.getDuration();
             } else {
-                remainedDuration = 0;
-                isPaused = true;
+                if (adQueued) {
+                    setAudioFile(Admin.getSong("Ad Break"));
+                    remainedDuration = audioFile.getDuration();
+                    adQueued = false;
+                } else {
+                    remainedDuration = 0;
+                    isPaused = true;
+                }
             }
         } else {
             if (repeatMode == Enums.RepeatMode.REPEAT_ONCE
@@ -219,8 +235,14 @@ public class PlayerSource {
     }
 
     private void updateAudioFile(UserWrapped wrapped) {
-        setAudioFile(audioCollection.getTrackByIndex(index));
-        wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(), premium);
+        if (adQueued) {
+            setAudioFile(Admin.getSong("Ad Break"));
+            adQueued = false;
+            index--;
+        } else {
+            setAudioFile(audioCollection.getTrackByIndex(index));
+            wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(), premium, remainedDuration);
+        }
     }
 
     /**

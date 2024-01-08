@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -82,8 +84,10 @@ public final class Main {
         Admin.setSongs(library.getSongs());
         Admin.setPodcasts(library.getPodcasts());
 
-        if (!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02") && !filePath1.contains("03") && !filePath1.contains("04"))
-            return;
+//        if (//!filePath1.contains("00") && !filePath1.contains("01") && !filePath1.contains("02") && !filePath1.contains("03") && !filePath1.contains("04") &&
+//            //!filePath1.contains("05") &&
+//            !filePath1.contains("09"))
+//            return;
 
         for (CommandInput command : commands) {
             Admin.updateTimestamp(command.getTimestamp());
@@ -137,6 +141,9 @@ public final class Main {
                 case "wrapped" -> outputs.add(CommandRunner.wrapped(command));
                 case "buyPremium" -> outputs.add(CommandRunner.buyPremium(command));
                 case "cancelPremium" -> outputs.add(CommandRunner.cancelPremium(command));
+                case "adBreak" -> outputs.add(CommandRunner.adBreak(command, commands[List.of(commands).indexOf(command) + 1]));
+                case "buyMerch" -> outputs.add(CommandRunner.buyMerch(command));
+                case "seeMerch" -> outputs.add(CommandRunner.seeMerch(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

@@ -176,7 +176,7 @@ public final class FilterUtils {
                                               final String name, final Enums.UserType type) {
         List<User> result = new ArrayList<>();
         for (User user : entries) {
-            if (user.getUsername().toLowerCase().startsWith(name)
+            if (user.getUsername().toLowerCase().startsWith(name.toLowerCase())
                 && user.getUserType().equals(type)) {
                 result.add(user);
             }

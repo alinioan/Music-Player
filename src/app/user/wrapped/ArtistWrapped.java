@@ -20,12 +20,15 @@ public class ArtistWrapped implements Wrapped {
     private Map<String, Integer> topFansMap;
     private List<String> topFans;
     private Map<String, Integer> topSongs;
+    @JsonIgnore
+    private double merchRevenue;
 
     public ArtistWrapped() {
         listeners = 0;
         this.topFansMap = new HashMap<>();
         this.topAlbums = new HashMap<>();
         this.topSongs = new HashMap<>();
+        merchRevenue = 0;
     }
 
     @Override

@@ -721,7 +721,9 @@ public final class Admin {
             if (user.getUserType().equals(Enums.UserType.NORMAL)) {
 
                 UserWrapped userWrapped = user.getPlayer().getWrapped();
-//                double totalSongs = userWrapped.getTopSongsWithArtistPremium().size();
+//                System.out.println(userWrapped.getAdMonetization());
+                putFreeRevenue(totalSongEarnings, userWrapped.getFreeSongRevenue());
+                putAdMonetization(userWrapped.getAdMonetization());
                 List<String> checkedArtists = new ArrayList<>();
 
                 for (Map.Entry<StringPair, Integer> entry1 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
@@ -754,11 +756,34 @@ public final class Admin {
                 }
             }
         }
-        System.out.println(totalSongEarnings);
         setMostProfitableSongs(totalSongEarnings);
+        addMerchRevenue();
         roundMonetization();
         sortMonetization();
         return monetization;
+    }
+
+    private static void putFreeRevenue(Map<StringPair, Double> totalSongEarnings, Map<StringPair, Double> freeSongRevenue) {
+        for (Map.Entry<StringPair, Double> entry : freeSongRevenue.entrySet()) {
+            if (totalSongEarnings.containsKey(entry.getKey())) {
+                totalSongEarnings.put(entry.getKey(), entry.getValue() + totalSongEarnings.get(entry.getKey()));
+            } else {
+                totalSongEarnings.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private static void putAdMonetization(Map<String, Monetization> adMonetization) {
+        for (Map.Entry<String, Monetization> entry : adMonetization.entrySet()) {
+            if (monetization.containsKey(entry.getKey())) {
+                Monetization newMonetization = monetization.get(entry.getKey());
+                newMonetization.setSongRevenue(entry.getValue().getSongRevenue() + newMonetization.getSongRevenue());
+                newMonetization.setMerchRevenue(entry.getValue().getMerchRevenue() + newMonetization.getMerchRevenue());
+                monetization.put(entry.getKey(), newMonetization);
+            } else {
+                monetization.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     private static void addNewMonetization(double artistListens, double totalSongs, String artist) {
@@ -796,6 +821,24 @@ public final class Admin {
                 monetization.put(entry1.getKey().getS2(), newMonetization);
             }
             checkedArtists.add(entry1.getKey().getS2());
+        }
+    }
+
+    static void addMerchRevenue() {
+        for (User user : users) {
+            if (user.getUserType().equals(Enums.UserType.ARTIST)) {
+                Artist artist = (Artist) user;
+                if (artist.getArtistWrapped().getMerchRevenue() > 0) {
+                    Monetization newMonetization = monetization.get(artist.getUsername());
+                    if (newMonetization != null) {
+                        newMonetization.setMerchRevenue(artist.getArtistWrapped().getMerchRevenue());
+                        monetization.put(artist.getUsername(), newMonetization);
+                    } else {
+                        monetization.put(artist.getUsername(),
+                                new Monetization(artist.getArtistWrapped().getMerchRevenue()));
+                    }
+                }
+            }
         }
     }
 
