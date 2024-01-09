@@ -7,6 +7,8 @@ import app.audio.Collections.PlaylistOutput;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
+import app.notifications.Notification;
+import app.notifications.NotificationObserver;
 import app.page.ArtistPage;
 import app.page.PageManager;
 import app.player.Player;
@@ -15,7 +17,6 @@ import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.user.artist.Artist;
 import app.user.artist.Merch;
-import app.user.wrapped.UserWrapped;
 import app.user.wrapped.Wrapped;
 import app.utils.Enums;
 import lombok.Getter;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * The type User.
  */
-public class User implements Comparable<User> {
+public class User implements Comparable<User>, NotificationObserver {
     @Getter
     private String username;
     @Getter
@@ -58,6 +59,9 @@ public class User implements Comparable<User> {
     private boolean premium;
     @Getter
     private List<String> ownedMerch;
+    private List<String> subscribedArtists;
+    @Getter
+    private List<Notification> notifications;
 
     /**
      * Instantiates a new normal User.
@@ -81,6 +85,8 @@ public class User implements Comparable<User> {
         this.userType = Enums.UserType.NORMAL;
         this.currentPage = "Home";
         this.ownedMerch = new ArrayList<>();
+        this.subscribedArtists = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     /**
@@ -465,6 +471,7 @@ public class User implements Comparable<User> {
         followedPlaylists.add(playlist);
         playlist.increaseFollowers();
 
+//        Admin.getUser(playlist.getOwner()).updateNotifications("Playlys");
 
         return "Playlist followed successfully.";
     }
@@ -605,6 +612,27 @@ public class User implements Comparable<User> {
         return username + " has added new merch successfully.";
     }
 
+    public String subscribe() {
+        if (selectedCreator == null) {
+            return "To subscribe you need to be on the page of an artist or host.";
+        }
+
+        User creator = Admin.getUser(selectedCreator);
+        if (subscribedArtists.contains(selectedCreator)) {
+            subscribedArtists.remove(selectedCreator);
+            if (creator.getUserType().equals(Enums.UserType.ARTIST)) {
+                ((Artist) creator).getSubscribers().remove(this);
+            }
+            return username + " unsubscribed from %s successfully.".formatted(selectedCreator);
+        } else {
+            subscribedArtists.add(selectedCreator);
+            if (creator.getUserType().equals(Enums.UserType.ARTIST)) {
+                ((Artist) creator).getSubscribers().add(this);
+            }
+            return username + " subscribed to %s successfully.".formatted(selectedCreator);
+        }
+    }
+
     /**
      * Sets the user type.
      *
@@ -623,5 +651,11 @@ public class User implements Comparable<User> {
     @Override
     public int compareTo(final User o) {
         return userType.compareTo(o.getUserType());
+    }
+
+    @Override
+    public void updateNotifications(String name, String description) {
+        Notification notification = new Notification(name, description);
+        notifications.add(notification);
     }
 }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import fileio.input.CommandInput;
 import fileio.input.LibraryInput;
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,6 +89,8 @@ public final class Main {
 //            //!filePath1.contains("05") &&
 //            !filePath1.contains("09"))
 //            return;
+//        if (!filePath1.contains("09") && !filePath1.contains("08") && !filePath1.contains("07"))
+//            return;
 
         for (CommandInput command : commands) {
             Admin.updateTimestamp(command.getTimestamp());
@@ -144,6 +147,8 @@ public final class Main {
                 case "adBreak" -> outputs.add(CommandRunner.adBreak(command, commands[List.of(commands).indexOf(command) + 1]));
                 case "buyMerch" -> outputs.add(CommandRunner.buyMerch(command));
                 case "seeMerch" -> outputs.add(CommandRunner.seeMerch(command));
+                case "subscribe" -> outputs.add(CommandRunner.subscribe(command));
+                case "getNotifications" -> outputs.add(CommandRunner.getNotifications(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

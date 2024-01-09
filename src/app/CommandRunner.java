@@ -3,6 +3,7 @@ package app;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Collections.PlaylistOutput;
 import app.audio.Collections.PodcastOutput;
+import app.notifications.Notification;
 import app.page.PageManager;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
@@ -1089,6 +1090,37 @@ public final class CommandRunner {
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("result", objectMapper.valueToTree(merchList));
+        return objectNode;
+    }
+
+    public static ObjectNode subscribe(final CommandInput commandInput)  {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        String merchList = user.subscribe();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", merchList);
+        return objectNode;
+    }
+
+    public static ObjectNode getNotifications(final CommandInput commandInput)  {
+        User user = Admin.getUser(commandInput.getUsername());
+        ObjectNode objectNode = checkUser(commandInput);
+        if (!objectNode.isEmpty()) {
+            return objectNode;
+        }
+
+        List<Notification> notificationList = user.getNotifications();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("notifications", objectMapper.valueToTree(notificationList));
+        user.getNotifications().clear();
         return objectNode;
     }
 

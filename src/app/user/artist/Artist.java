@@ -12,6 +12,7 @@ import app.utils.Enums;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class Artist extends User {
@@ -19,6 +20,7 @@ public class Artist extends User {
     private ArrayList<Event> events;
     private ArrayList<Merch> merches;
     private ArtistWrapped artistWrapped;
+    private List<User> subscribers;
 
     /**
      * Instantiates a new User.
@@ -36,6 +38,8 @@ public class Artist extends User {
         events = new ArrayList<>();
         merches = new ArrayList<>();
         artistWrapped = new ArtistWrapped();
+        subscribers = new ArrayList<>();
+        subscribers = new ArrayList<>();
     }
 
     /**
@@ -55,6 +59,9 @@ public class Artist extends User {
         }
         super.getPlaylists().add(album);
         this.albums.add(album);
+        for (User subscriber : subscribers) {
+            subscriber.updateNotifications("New Album", "New Album from %s.".formatted(getUsername()));
+        }
         return this.getUsername() + " has added new album successfully.";
     }
 
@@ -104,6 +111,9 @@ public class Artist extends User {
             return  "Event for " + this.getUsername() + " does not have a valid date.";
         }
         this.events.add(newEvent);
+        for (User subscriber : subscribers) {
+            subscriber.updateNotifications("New Event", "New Event from %s.".formatted(getUsername()));
+        }
         return this.getUsername() + " has added new event successfully.";
     }
 
@@ -152,6 +162,9 @@ public class Artist extends User {
             return  "Price for merchandise can not be negative.";
         }
         this.merches.add(newMerch);
+        for (User subscriber : subscribers) {
+            subscriber.updateNotifications("New Merchandise", "New Merchandise from %s.".formatted(getUsername()));
+        }
         return this.getUsername() + " has added new merchandise successfully.";
     }
 

@@ -586,7 +586,7 @@ public final class Admin {
             return artist.getUsername() + " doesn't have an album with the given name.";
         }
         artist.getAlbums().remove(albumRemove);
-        return artist.getUsername() + " deleted the album successfully.\n";
+        return artist.getUsername() + " deleted the album successfully.";
     }
 
     /**
@@ -598,6 +598,9 @@ public final class Admin {
      */
     private static boolean checkAlbumDelete(final Album albumRemove) {
         for (User crtUser : users) {
+            if (!crtUser.getUserType().equals(Enums.UserType.NORMAL)) {
+                continue;
+            }
             String sourceCollectionName = null;
             String sourceFileName = null;
             if (crtUser.getPlayer().getSource() != null) {
