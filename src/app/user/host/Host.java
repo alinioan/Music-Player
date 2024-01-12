@@ -1,8 +1,12 @@
 package app.user.host;
 
+import app.Admin;
 import app.audio.Collections.Podcast;
 import app.audio.Collections.PodcastOutput;
 import app.user.User;
+import app.user.wrapped.HostWrapped;
+import app.user.wrapped.UserWrapped;
+import app.user.wrapped.Wrapped;
 import app.utils.Enums;
 import lombok.Getter;
 
@@ -12,6 +16,7 @@ import java.util.ArrayList;
 public class Host extends User {
     private ArrayList<Podcast> podcasts;
     private ArrayList<Announcement> announcements;
+    private HostWrapped hostWrapped;
 
     /**
      * Instantiates a new User.
@@ -26,6 +31,7 @@ public class Host extends User {
         super.setCurrentPage("");
         podcasts = new ArrayList<>();
         announcements = new ArrayList<>();
+        hostWrapped = new HostWrapped();
     }
 
     /**
@@ -97,5 +103,13 @@ public class Host extends User {
             podcastOutputs.add(new PodcastOutput(podcast));
         }
         return podcastOutputs;
+    }
+
+    public Wrapped getWrapped() {
+        for (User user : Admin.getUsers()) {
+            UserWrapped userWrapped = user.getPlayer().getWrapped();
+            hostWrapped.updateStats(userWrapped, this, user.getUsername());
+        }
+        return hostWrapped.getSortedWrapped();
     }
 }

@@ -2,6 +2,7 @@ package app.player;
 
 import app.audio.Collections.AudioCollection;
 import app.audio.Collections.Playlist;
+import app.audio.Collections.Podcast;
 import app.audio.Files.AudioFile;
 import app.audio.LibraryEntry;
 import app.user.wrapped.UserWrapped;
@@ -115,10 +116,13 @@ public final class Player {
             bookmarkPodcast();
         }
         if (sourceType.equals("song")) {
-            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY, premium, ((AudioFile) entry).getDuration());
+            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY, premium, null);
         }
         if (sourceType.equals("playlist") || sourceType.equals("album")) {
-            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST, premium, ((Playlist) entry).getTrackByIndex(0).getDuration());
+            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST, premium, null);
+        }
+        if (sourceType.equals("podcast")) {
+            wrapped.updateStats(((Podcast) entry).getTrackByIndex(0), Enums.PlayerSourceType.PODCAST, premium, ((Podcast) entry).getOwner());
         }
         this.type = sourceType;
         this.source = createSource(sourceType, entry, bookmarks);
@@ -205,7 +209,11 @@ public final class Player {
      */
     public void next() {
         if (source.getDuration() == 0) {
-            wrapped.updateStats(getCurrentAudioFile(), source.getType(), premium, 0);
+            String hostName = null;
+            if (source.getType().equals(Enums.PlayerSourceType.PODCAST)) {
+                hostName = source.getAudioCollection().getOwner();
+            }
+            wrapped.updateStats(getCurrentAudioFile(), source.getType(), premium, hostName);
         }
         paused = source.setNextAudioFile(repeatMode, shuffle, wrapped);
         if (repeatMode == Enums.RepeatMode.REPEAT_ONCE) {
@@ -325,7 +333,7 @@ public final class Player {
                            final int nextTimestamp, final boolean isLoad) {
         if (this.source != null) {
 //            if (isLoad && nextTimestamp - timestamp < 10) {
-                System.out.print(timestamp + " ");
+//                System.out.print(timestamp + " ");
                 wrapped.calculateAdRevenue(price);
 //            }
             this.adQueued = true;

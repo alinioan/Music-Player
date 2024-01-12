@@ -13,7 +13,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class ArtistWrapped implements Wrapped {
+public class ArtistWrapped extends Wrapped {
     int listeners;
     private Map<String, Integer> topAlbums;
     @JsonIgnore
@@ -40,28 +40,6 @@ public class ArtistWrapped implements Wrapped {
         sortedWrapped.setTopFans(new ArrayList<>(sortAndRetrieveTop5(this.getTopFansMap()).keySet()));
         sortedWrapped.setTopSongs(sortAndRetrieveTop5(this.getTopSongs()));
         return sortedWrapped;
-    }
-
-    private Map<String, Integer> sortAndRetrieveTop5(Map<String, Integer> unsortedMap) {
-        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(unsortedMap.entrySet());
-
-        entryList.sort((entry1, entry2) -> {
-            int valueComparison = entry2.getValue().compareTo(entry1.getValue());
-            return (valueComparison == 0) ? entry1.getKey().compareTo(entry2.getKey()) : valueComparison;
-        });
-
-        Map<String, Integer> sortedMap = new LinkedHashMap<>();
-
-        int count = 0;
-        for (Map.Entry<String, Integer> entry : entryList) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-            count++;
-            if (count == 5) {
-                break;
-            }
-        }
-
-        return sortedMap;
     }
 
     public void updateStats(UserWrapped userWrapped, Artist artist, String username) {

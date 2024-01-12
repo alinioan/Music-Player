@@ -241,7 +241,7 @@ public class PlayerSource {
             index--;
         } else {
             setAudioFile(audioCollection.getTrackByIndex(index));
-            wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(), premium, remainedDuration);
+            wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(), premium, audioCollection.getOwner());
         }
     }
 

@@ -9,6 +9,7 @@ import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.user.Monetization;
 import app.user.wrapped.ArtistWrapped;
+import app.user.wrapped.HostWrapped;
 import app.user.wrapped.UserWrapped;
 import app.user.artist.Artist;
 import app.user.User;
@@ -1007,6 +1008,13 @@ public final class CommandRunner {
             if ((artistWrapped.getListeners() == 0 && artistWrapped.getTopSongs().isEmpty()
                     && artistWrapped.getTopAlbums().isEmpty() && artistWrapped.getTopFans().isEmpty())) {
                 objectNode.put("message", "No data to show for artist " + user.getUsername() + ".");
+            } else {
+                objectNode.put("result", objectMapper.valueToTree(wrapped));
+            }
+        } else {
+            HostWrapped hostWrapped = (HostWrapped) wrapped;
+            if ((hostWrapped.getListeners() == 0 && hostWrapped.getTopEpisodes().isEmpty())) {
+                objectNode.put("message", "No data to show for host " + user.getUsername() + ".");
             } else {
                 objectNode.put("result", objectMapper.valueToTree(wrapped));
             }

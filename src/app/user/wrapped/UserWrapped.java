@@ -15,7 +15,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class UserWrapped implements Wrapped {
+public class UserWrapped extends Wrapped {
     private Map<String, Integer> topArtists;
     private Map<String, Integer> topGenres;
     private Map<String, Integer> topSongs;
@@ -33,6 +33,8 @@ public class UserWrapped implements Wrapped {
     @JsonIgnore
     private Map<StringPair, Double> freeSongRevenue;
     private Map<String, Integer> topEpisodes;
+    @JsonIgnore
+    private Map<StringPair, Integer> topEpisodesWithHost;
 
     public UserWrapped() {
         topArtists = new HashMap<>();
@@ -46,6 +48,7 @@ public class UserWrapped implements Wrapped {
         topSongsWithArtistFree = new HashMap<>();
         freeSongRevenue = new HashMap<>();
         adMonetization = new HashMap<>();
+        topEpisodesWithHost = new HashMap<>();
     }
 
     public UserWrapped(UserWrapped wrapped) {
@@ -57,6 +60,7 @@ public class UserWrapped implements Wrapped {
         this.topSongsWithArtist = wrapped.getTopSongsWithArtist();
         topSongsWithArtistPremium = wrapped.getTopSongsWithArtistPremium();
         this.topSongs = wrapped.getTopSongs();
+        this.topEpisodesWithHost = wrapped.getTopEpisodesWithHost();
     }
 
     @JsonIgnore
@@ -70,29 +74,7 @@ public class UserWrapped implements Wrapped {
         return sortedWrapped;
     }
 
-    private Map<String, Integer> sortAndRetrieveTop5(Map<String, Integer> unsortedMap) {
-        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(unsortedMap.entrySet());
-
-        entryList.sort((entry1, entry2) -> {
-            int valueComparison = entry2.getValue().compareTo(entry1.getValue());
-            return (valueComparison == 0) ? entry1.getKey().compareTo(entry2.getKey()) : valueComparison;
-        });
-
-        Map<String, Integer> sortedMap = new LinkedHashMap<>();
-
-        int count = 0;
-        for (Map.Entry<String, Integer> entry : entryList) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-            count++;
-            if (count == 5) {
-                break;
-            }
-        }
-
-        return sortedMap;
-    }
-
-    public void updateStats(AudioFile file, Enums.PlayerSourceType type, boolean premium, final int remainedDuration) {
+    public void updateStats(AudioFile file, Enums.PlayerSourceType type, boolean premium, String hostName) {
         switch (type) {
             case LIBRARY, PLAYLIST -> {
                 Song song = (Song) file;
@@ -114,11 +96,9 @@ public class UserWrapped implements Wrapped {
             }
             case PODCAST -> {
                 Episode episode = (Episode) file;
-                if (topEpisodes.containsKey(episode.getName())) {
-                    topEpisodes.put(episode.getName(), topEpisodes.get(episode.getName()) + 1);
-                } else if (remainedDuration == 0) {
-                    topEpisodes.put(episode.getName(), 1);
-                }
+                updateMap(topEpisodes, episode.getName());
+                StringPair pairEpisode = new StringPair(episode.getName(), hostName);
+                updateMap(topEpisodesWithHost, pairEpisode);
             }
             default -> {
 

@@ -89,7 +89,7 @@ public final class Main {
 //            //!filePath1.contains("05") &&
 //            !filePath1.contains("09"))
 //            return;
-//        if (!filePath1.contains("09") && !filePath1.contains("08") && !filePath1.contains("07"))
+//        if (!filePath1.contains("10"))
 //            return;
 
         for (CommandInput command : commands) {
