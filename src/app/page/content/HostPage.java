@@ -1,6 +1,8 @@
-package app.page;
+package app.page.content;
 
 import app.audio.Collections.Podcast;
+import app.page.Visitable;
+import app.page.Visitor;
 import app.user.host.Announcement;
 import lombok.Getter;
 

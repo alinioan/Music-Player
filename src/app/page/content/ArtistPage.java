@@ -1,6 +1,8 @@
-package app.page;
+package app.page.content;
 
 import app.audio.Collections.Album;
+import app.page.Visitable;
+import app.page.Visitor;
 import app.user.artist.Event;
 import app.user.artist.Merch;
 import lombok.Getter;

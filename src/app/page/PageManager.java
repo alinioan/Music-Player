@@ -1,5 +1,11 @@
 package app.page;
 
+import app.Admin;
+import app.audio.Files.Song;
+import app.page.content.ArtistPage;
+import app.page.content.HomePage;
+import app.page.content.HostPage;
+import app.page.content.LikedContentPage;
 import app.user.User;
 import app.user.artist.Artist;
 import app.user.host.Host;
@@ -8,8 +14,8 @@ import lombok.Getter;
 
 import java.util.HashMap;
 
-@Getter
 public final class PageManager {
+    @Getter
     private static HashMap<String, HomePage> homePageHashMap = new HashMap<>();
     private static HashMap<String, LikedContentPage> likedContentPageHashMap = new HashMap<>();
     @Getter
@@ -26,11 +32,18 @@ public final class PageManager {
      * @param user the user.
      */
     private static void addNormalPages(final User user) {
-         HomePage homePage = new HomePage(user.getLikedSongs(), user.getFollowedPlaylists());
-         homePageHashMap.put(user.getUsername(), homePage);
-         LikedContentPage likedContentPage = new LikedContentPage(user.getLikedSongs(),
+        HomePage homePage = new HomePage(user.getLikedSongs(), user.getFollowedPlaylists());
+        if (homePageHashMap.containsKey(user.getUsername())) {
+            HomePage oldHomePage = homePageHashMap.get(user.getUsername());
+            homePage.setSongRecommendations(oldHomePage.getSongRecommendations());
+            homePage.setPlaylistRecommendations(oldHomePage.getPlaylistRecommendations());
+            homePage.setLastRecommendation(oldHomePage.getLastRecommendation());
+            homePage.setLastRecommendationType(oldHomePage.getLastRecommendationType());
+        }
+        homePageHashMap.put(user.getUsername(), homePage);
+        LikedContentPage likedContentPage = new LikedContentPage(user.getLikedSongs(),
                                                     user.getFollowedPlaylists());
-         likedContentPageHashMap.put(user.getUsername(), likedContentPage);
+        likedContentPageHashMap.put(user.getUsername(), likedContentPage);
     }
 
     /**
@@ -38,7 +51,7 @@ public final class PageManager {
      *
      * @param artist the artist.
      */
-    private static void addArtistPage(final Artist artist) {
+    public static void addArtistPage(final Artist artist) {
         ArtistPage artistPage = new ArtistPage(artist.getAlbums(),
                                     artist.getEvents(), artist.getMerches());
         artistPageHashMap.put(artist.getUsername(), artistPage);
@@ -49,7 +62,7 @@ public final class PageManager {
      *
      * @param host the host.
      */
-    private static void addHostPage(final Host host) {
+    public static void addHostPage(final Host host) {
         HostPage hostPage = new HostPage(host.getPodcasts(), host.getAnnouncements());
         hostPageHashMap.put(host.getUsername(), hostPage);
     }
@@ -103,10 +116,31 @@ public final class PageManager {
      * @return the output message.
      */
     public static String changePage(final User user, final String nextPage) {
-        user.setSelectedCreator(null);
-        user.setCreatorType(null);
-        user.setCurrentPage(nextPage);
+        PageCommand changePageCommand = new ChangePageCommand(user, nextPage);
+        user.getInvoker().getUndoStack().clear();
+        user.getInvoker().execute(changePageCommand);
         return user.getUsername() + " accessed " + nextPage + " successfully.";
+    }
+
+    public static String updateRecommendations(User user, String recommendation) {
+        if (user.getUserType() != Enums.UserType.NORMAL) {
+            return user.getUsername() + " is not a normal user.";
+        }
+        HomePage userHomePage = homePageHashMap.get(user.getUsername());
+        switch (recommendation) {
+            case "random_song" -> {
+                return userHomePage.recommendSong(user);
+            }
+            case "random_playlist" -> {
+                return userHomePage.recommendPlaylist(user);
+            }
+            case "fans_playlist" -> {
+                return userHomePage.recommendFanPlaylist(user);
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     /**

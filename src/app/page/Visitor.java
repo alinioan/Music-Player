@@ -1,5 +1,10 @@
 package app.page;
 
+import app.page.content.ArtistPage;
+import app.page.content.HomePage;
+import app.page.content.HostPage;
+import app.page.content.LikedContentPage;
+
 public interface Visitor {
 
     /**

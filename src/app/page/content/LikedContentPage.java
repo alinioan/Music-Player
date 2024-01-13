@@ -1,7 +1,9 @@
-package app.page;
+package app.page.content;
 
 import app.audio.Collections.Playlist;
 import app.audio.Files.Song;
+import app.page.Visitable;
+import app.page.Visitor;
 import lombok.Getter;
 
 import java.util.ArrayList;

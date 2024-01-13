@@ -89,7 +89,7 @@ public final class Main {
 //            //!filePath1.contains("05") &&
 //            !filePath1.contains("09"))
 //            return;
-//        if (!filePath1.contains("10"))
+//        if (!filePath1.contains("14") && !filePath1.contains("11"))
 //            return;
 
         for (CommandInput command : commands) {
@@ -149,6 +149,10 @@ public final class Main {
                 case "seeMerch" -> outputs.add(CommandRunner.seeMerch(command));
                 case "subscribe" -> outputs.add(CommandRunner.subscribe(command));
                 case "getNotifications" -> outputs.add(CommandRunner.getNotifications(command));
+                case "updateRecommendations" -> outputs.add(CommandRunner.updateRecommendations(command));
+                case "loadRecommendations" -> outputs.add(CommandRunner.loadRecommendations(command));
+                case "nextPage" -> outputs.add(CommandRunner.nextPage(command));
+                case "previousPage" -> outputs.add(CommandRunner.previousPage(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

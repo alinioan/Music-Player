@@ -5,6 +5,10 @@ import app.audio.Collections.Playlist;
 import app.audio.Collections.Podcast;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
+import app.page.content.ArtistPage;
+import app.page.content.HomePage;
+import app.page.content.HostPage;
+import app.page.content.LikedContentPage;
 import app.user.artist.Event;
 import app.user.artist.Merch;
 import app.user.host.Announcement;
@@ -24,7 +28,9 @@ public final class PrintCurrentPage implements Visitor {
     @Override
     public String visit(final HomePage homePage) {
         return "Liked songs:\n\t" + homePage.getSongs().toString()
-                + "\n\nFollowed playlists:\n\t" + homePage.getPlaylists().toString();
+                + "\n\nFollowed playlists:\n\t" + homePage.getPlaylists().toString()
+                + "\n\nSong recommendations:\n\t" + homePage.getSongRecommendations()
+                + "\n\nPlaylists recommendations:\n\t" + homePage.getPlaylistRecommendations();
     }
 
     /**

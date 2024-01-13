@@ -9,7 +9,9 @@ import app.audio.Files.Song;
 import app.audio.LibraryEntry;
 import app.notifications.Notification;
 import app.notifications.NotificationObserver;
-import app.page.ArtistPage;
+import app.page.Invoker;
+import app.page.content.ArtistPage;
+import app.page.content.HomePage;
 import app.page.PageManager;
 import app.player.Player;
 import app.player.PlayerStats;
@@ -62,6 +64,8 @@ public class User implements Comparable<User>, NotificationObserver {
     private List<String> subscribedArtists;
     @Getter
     private List<Notification> notifications;
+    @Getter
+    private Invoker invoker;
 
     /**
      * Instantiates a new normal User.
@@ -87,6 +91,7 @@ public class User implements Comparable<User>, NotificationObserver {
         this.ownedMerch = new ArrayList<>();
         this.subscribedArtists = new ArrayList<>();
         this.notifications = new ArrayList<>();
+        this.invoker = new Invoker();
     }
 
     /**
@@ -631,6 +636,35 @@ public class User implements Comparable<User>, NotificationObserver {
             }
             return username + " subscribed to %s successfully.".formatted(selectedCreator);
         }
+    }
+
+    public String loadRecommendation() {
+        HomePage homePage = PageManager.getHomePageHashMap().get(username);
+        if (homePage.getSongRecommendations().isEmpty()
+                && homePage.getPlaylistRecommendations().isEmpty()) {
+            return "No recommendations available.";
+        }
+        Filters filters = new Filters(homePage.getLastRecommendation());
+        search(filters, homePage.getLastRecommendationType());
+        select(1);
+        load();
+        return "Playback loaded successfully.";
+    }
+
+    public String nextPage() {
+        if (invoker.getUndoStack().isEmpty()) {
+            return "There are no pages left to go forward.";
+        }
+        invoker.redo();
+        return "The user %s has navigated successfully to the next page.".formatted(username);
+    }
+
+    public String previousPage() {
+        if (invoker.getCommandStack().isEmpty()) {
+            return "There are no pages left to go back.";
+        }
+        invoker.undo();
+        return "The user %s has navigated successfully to the previous page.".formatted(username);
     }
 
     /**

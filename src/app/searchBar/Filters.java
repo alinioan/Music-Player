@@ -30,4 +30,8 @@ public class Filters {
         this.followers = filters.getFollowers();
         this.description = filters.getDescription();
     }
+
+    public Filters(final String name) {
+        this.name = name;
+    }
 }
