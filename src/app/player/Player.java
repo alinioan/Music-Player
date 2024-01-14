@@ -124,6 +124,9 @@ public final class Player {
         if (sourceType.equals("podcast")) {
             wrapped.updateStats(((Podcast) entry).getTrackByIndex(0), Enums.PlayerSourceType.PODCAST, premium, ((Podcast) entry).getOwner());
         }
+        this.adQueued = false;
+        this.adPrice = 0;
+
         this.type = sourceType;
         this.source = createSource(sourceType, entry, bookmarks);
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
@@ -331,10 +334,12 @@ public final class Player {
 
     public boolean queueAd(final int price, final int timestamp,
                            final int nextTimestamp, final boolean isLoad) {
-        if (this.source != null) {
-//            if (isLoad && nextTimestamp - timestamp < 10) {
-//                System.out.print(timestamp + " ");
-                wrapped.calculateAdRevenue(price);
+        if (this.source != null && !this.source.getAudioFile().getName().equals("Ad Break")) {
+//            if (isLoad && timestamp + source.getDuration() <= nextTimestamp) {
+////                System.out.println("Good ad!!!! " + timestamp + "time from ad to load: " + (nextTimestamp - timestamp - source.getDuration()));
+//                wrapped.calculateAdRevenue(price);
+//            } else {
+////                System.out.println("Bad ad: " + timestamp + "time from ad to load: " + (nextTimestamp - timestamp - source.getDuration()));
 //            }
             this.adQueued = true;
             this.adPrice = price;

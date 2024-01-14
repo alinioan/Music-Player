@@ -69,6 +69,11 @@ public class ArtistWrapped extends Wrapped {
         }
     }
 
+    @JsonIgnore
+    public boolean isEmpty() {
+        return (topFans == null || topFans.isEmpty()) && topSongs.isEmpty() && topAlbums.isEmpty();
+    }
+
     @Override
     public String toString() {
         return "ArtistWrapped{" +

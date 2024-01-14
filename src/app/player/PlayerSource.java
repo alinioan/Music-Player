@@ -113,6 +113,7 @@ public class PlayerSource {
             } else {
                 if (adQueued) {
                     setAudioFile(Admin.getSong("Ad Break"));
+                    wrapped.calculateAdRevenue(adPrice);
                     remainedDuration = audioFile.getDuration();
                     adQueued = false;
                 } else {
@@ -139,8 +140,16 @@ public class PlayerSource {
                     }
                 } else {
                     if (index == audioCollection.getNumberOfTracks() - 1) {
-                        remainedDuration = 0;
-                        isPaused = true;
+                        if (adQueued) {
+                            setAudioFile(Admin.getSong("Ad Break"));
+                            wrapped.calculateAdRevenue(adPrice);
+                            remainedDuration = audioFile.getDuration();
+                            adQueued = false;
+                        } else {
+                            remainedDuration = 0;
+                            isPaused = true;
+
+                        }
                     } else {
                         index++;
                         updateAudioFile(wrapped);
@@ -237,6 +246,7 @@ public class PlayerSource {
     private void updateAudioFile(UserWrapped wrapped) {
         if (adQueued) {
             setAudioFile(Admin.getSong("Ad Break"));
+            wrapped.calculateAdRevenue(adPrice);
             adQueued = false;
             index--;
         } else {

@@ -28,6 +28,7 @@ import java.util.Map;
  * The type Command runner.
  */
 public final class CommandRunner {
+    private static CommandRunner instance;
     /**
      * The Object mapper.
      */
@@ -36,13 +37,20 @@ public final class CommandRunner {
     private CommandRunner() {
     }
 
+    public static CommandRunner getInstance() {
+        if (instance == null) {
+            instance = new CommandRunner();
+        }
+        return instance;
+    }
+
     /**
      * Search object node.
      *
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode search(final CommandInput commandInput) {
+    public ObjectNode search(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             objectNode.put("results",  objectMapper.valueToTree(new ArrayList<>()));
@@ -70,7 +78,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode select(final CommandInput commandInput) {
+    public ObjectNode select(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -93,7 +101,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode load(final CommandInput commandInput) {
+    public ObjectNode load(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -115,7 +123,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode playPause(final CommandInput commandInput) {
+    public ObjectNode playPause(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -137,7 +145,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode repeat(final CommandInput commandInput) {
+    public ObjectNode repeat(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -159,7 +167,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode shuffle(final CommandInput commandInput) {
+    public ObjectNode shuffle(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -182,7 +190,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode forward(final CommandInput commandInput) {
+    public ObjectNode forward(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -204,7 +212,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode backward(final CommandInput commandInput) {
+    public ObjectNode backward(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -226,7 +234,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode like(final CommandInput commandInput) {
+    public ObjectNode like(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -248,7 +256,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode next(final CommandInput commandInput) {
+    public ObjectNode next(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -270,7 +278,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode prev(final CommandInput commandInput) {
+    public ObjectNode prev(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -292,7 +300,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode createPlaylist(final CommandInput commandInput) {
+    public ObjectNode createPlaylist(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -315,7 +323,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode addRemoveInPlaylist(final CommandInput commandInput) {
+    public ObjectNode addRemoveInPlaylist(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -337,7 +345,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode switchVisibility(final CommandInput commandInput) {
+    public ObjectNode switchVisibility(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -359,7 +367,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode showPlaylists(final CommandInput commandInput) {
+    public ObjectNode showPlaylists(final CommandInput commandInput) {
 
         User user = Admin.getUser(commandInput.getUsername());
         ArrayList<PlaylistOutput> playlists = user.showPlaylists();
@@ -379,7 +387,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode follow(final CommandInput commandInput) {
+    public ObjectNode follow(final CommandInput commandInput) {
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -401,7 +409,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode status(final CommandInput commandInput) {
+    public ObjectNode status(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -423,7 +431,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode showLikedSongs(final CommandInput commandInput) {
+    public ObjectNode showLikedSongs(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -445,7 +453,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the preferred genre
      */
-    public static ObjectNode getPreferredGenre(final CommandInput commandInput) {
+    public ObjectNode getPreferredGenre(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -485,7 +493,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the top 5 playlists
      */
-    public static ObjectNode getTop5Playlists(final CommandInput commandInput) {
+    public ObjectNode getTop5Playlists(final CommandInput commandInput) {
         List<String> playlists = Admin.getTop5Playlists();
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -502,7 +510,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the 5 albums.
      */
-    public static ObjectNode getTop5Albums(final CommandInput commandInput) {
+    public ObjectNode getTop5Albums(final CommandInput commandInput) {
         List<String> playlists = Admin.getTop5Albums();
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -519,7 +527,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the 5 artists.
      */
-    public static ObjectNode getTop5Artists(final CommandInput commandInput) {
+    public ObjectNode getTop5Artists(final CommandInput commandInput) {
         List<String> playlists = Admin.getTop5Artists();
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -536,7 +544,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the object node
      */
-    public static ObjectNode switchConnectionStatus(final CommandInput commandInput) {
+    public ObjectNode switchConnectionStatus(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -557,7 +565,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return list of online users.
      */
-    public static ObjectNode getOnlineUsers(final CommandInput commandInput) {
+    public ObjectNode getOnlineUsers(final CommandInput commandInput) {
         List<String> onlineUsers = Admin.getOnlineUsers();
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -574,7 +582,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the object node.
      */
-    public static ObjectNode addUser(final CommandInput commandInput) {
+    public ObjectNode addUser(final CommandInput commandInput) {
         String message = Admin.addUser(commandInput.getUsername(), commandInput.getAge(),
                                 commandInput.getCity(),
                                 Enums.getTypeFromString(commandInput.getType()));
@@ -593,7 +601,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode deleteUser(final CommandInput commandInput) {
+    public ObjectNode deleteUser(final CommandInput commandInput) {
         String message = Admin.deleteUser(commandInput.getUsername());
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -610,7 +618,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode addAlbum(final CommandInput commandInput) {
+    public ObjectNode addAlbum(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -632,7 +640,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode removeAlbum(final CommandInput commandInput) {
+    public ObjectNode removeAlbum(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -653,7 +661,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return list of albums.
      */
-    public static ObjectNode showAlbums(final CommandInput commandInput) {
+    public ObjectNode showAlbums(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ArrayList<AlbumOutput> albumOutputs = ((Artist) user).showAlbums();
 
@@ -672,7 +680,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode addEvent(final CommandInput commandInput) {
+    public ObjectNode addEvent(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
         ObjectNode objectNode = checkUserNull(commandInput);
@@ -701,7 +709,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode removeEvent(final CommandInput commandInput) {
+    public ObjectNode removeEvent(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
         ObjectNode objectNode = checkUserNull(commandInput);
@@ -728,7 +736,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode addMerch(final CommandInput commandInput) {
+    public ObjectNode addMerch(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
         ObjectNode objectNode = checkUserNull(commandInput);
@@ -757,7 +765,7 @@ public final class CommandRunner {
      * @param commandInput the command input
      * @return the output message
      */
-    public static ObjectNode addPodcast(final CommandInput commandInput) {
+    public ObjectNode addPodcast(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -778,7 +786,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode removePodcast(final CommandInput commandInput) {
+    public ObjectNode removePodcast(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -799,7 +807,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the podcast.
      */
-    public static ObjectNode showPodcasts(final CommandInput commandInput) {
+    public ObjectNode showPodcasts(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ArrayList<PodcastOutput> podcastOutputs = ((Host) user).showPodcasts();
 
@@ -818,7 +826,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode addAnnouncement(final CommandInput commandInput) {
+    public ObjectNode addAnnouncement(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
         ObjectNode objectNode = checkUserNull(commandInput);
@@ -846,7 +854,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the output message.
      */
-    public static ObjectNode removeAnnouncement(final CommandInput commandInput) {
+    public ObjectNode removeAnnouncement(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
 
         ObjectNode objectNode = checkUserNull(commandInput);
@@ -873,7 +881,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return list with all the users.
      */
-    public static ObjectNode getAllUsers(final CommandInput commandInput) {
+    public ObjectNode getAllUsers(final CommandInput commandInput) {
         List<String> allUser = Admin.getAllUsers();
 
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -890,7 +898,7 @@ public final class CommandRunner {
      * @param commandInput command input.
      * @return object node with error message if the user doesn't exist or an empty object node.
      */
-    static ObjectNode checkUserNull(final CommandInput commandInput) {
+    private static ObjectNode checkUserNull(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = objectMapper.createObjectNode();
         if (user == null) {
@@ -910,7 +918,7 @@ public final class CommandRunner {
      * @param commandInput command input.
      * @return object node with error message if the user is offline or an empty object node.
      */
-    static ObjectNode checkUserOffline(final CommandInput commandInput) {
+    private static ObjectNode checkUserOffline(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = objectMapper.createObjectNode();
         if (!user.isOnline()) {
@@ -929,7 +937,7 @@ public final class CommandRunner {
      * @param commandInput command input.
      * @return the object node.
      */
-    static ObjectNode checkUser(final CommandInput commandInput) {
+    private static ObjectNode checkUser(final CommandInput commandInput) {
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
@@ -943,7 +951,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the page as a string.
      */
-    public static ObjectNode printCurrentPage(final CommandInput commandInput) {
+    public ObjectNode printCurrentPage(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -966,7 +974,7 @@ public final class CommandRunner {
      * @param commandInput the command input.
      * @return the message.
      */
-    public static ObjectNode changePage(final CommandInput commandInput) {
+    public ObjectNode changePage(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -982,7 +990,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode wrapped(final CommandInput commandInput) {
+    /**
+     * Get wrapped for user.
+     *
+     * @param commandInput the command.
+     * @return the wrapped stats.
+     */
+    public ObjectNode wrapped(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUserNull(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1022,7 +1036,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode buyPremium(final CommandInput commandInput) {
+    /**
+     * Buy premium membership.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode buyPremium(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1037,7 +1057,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode cancelPremium(final CommandInput commandInput) {
+    /**
+     * Cancel premium membership.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode cancelPremium(final CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1052,14 +1078,23 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode adBreak(final CommandInput commandInput, final CommandInput nextCommand) {
+    /**
+     * Ad break.
+     *
+     * @param commandInput the command.
+     * @param nextCommand the next command.
+     * @return the message.
+     */
+    public ObjectNode adBreak(final CommandInput commandInput,
+                                     final CommandInput nextCommand) {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
             return objectNode;
         }
         boolean isLoad = false;
-        if (nextCommand.getCommand().equals("search")) {
+        if (nextCommand.getCommand().equals("search")
+                || nextCommand.getUsername().equals(commandInput.getUsername())) {
             isLoad = true;
         }
         String message = user.adBreak(commandInput.getPrice(), commandInput.getTimestamp(),
@@ -1071,7 +1106,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode buyMerch(final CommandInput commandInput)  {
+    /**
+     * Buy merch.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode buyMerch(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1086,7 +1127,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode seeMerch(final CommandInput commandInput)  {
+    /**
+     * See the bought merch.
+     *
+     * @param commandInput the command.
+     * @return the items.
+     */
+    public ObjectNode seeMerch(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1101,7 +1148,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode subscribe(final CommandInput commandInput)  {
+    /**
+     * Subscribe to a creator.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode subscribe(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1116,7 +1169,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode getNotifications(final CommandInput commandInput)  {
+    /**
+     * Get notification list for user.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode getNotifications(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1132,7 +1191,12 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode updateRecommendations(final CommandInput commandInput)  {
+    /**
+     * Update recommendations.
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode updateRecommendations(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1147,7 +1211,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode loadRecommendations(final CommandInput commandInput)  {
+    /**
+     * Load recommendations.
+     *
+     * @param commandInput the command.
+     * @return the message
+     */
+    public ObjectNode loadRecommendations(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1162,7 +1232,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode nextPage(final CommandInput commandInput)  {
+    /**
+     * Switch page to the next page.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode nextPage(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1177,7 +1253,13 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode previousPage(final CommandInput commandInput)  {
+    /**
+     * Switch page to the previous page.
+     *
+     * @param commandInput the command.
+     * @return the message.
+     */
+    public ObjectNode previousPage(final CommandInput commandInput)  {
         User user = Admin.getUser(commandInput.getUsername());
         ObjectNode objectNode = checkUser(commandInput);
         if (!objectNode.isEmpty()) {
@@ -1192,7 +1274,12 @@ public final class CommandRunner {
         return objectNode;
     }
 
-    public static ObjectNode endProgram() {
+    /**
+     * Calculates end program ranking for artists.
+     *
+     * @return the ranking.
+     */
+    public ObjectNode endProgram() {
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         Map<String, Monetization> monetization = Admin.getMonetizationRanking();

@@ -18,6 +18,7 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
@@ -29,6 +30,7 @@ public final class Admin {
     private static List<User> users = new ArrayList<>();
     private static List<Song> songs = new ArrayList<>();
     private static List<Podcast> podcasts = new ArrayList<>();
+    @Getter
     private static int timestamp = 0;
     private static final int LIMIT = 5;
     private static final double VALUE = 1000000.0;
@@ -618,7 +620,8 @@ public final class Admin {
             }
 
             for (Song songAlbum : albumRemove.getSongs()) {
-                if (songAlbum.getName().equals(sourceFileName)) {
+                if (songAlbum.getName().equals(sourceFileName)
+                        && songAlbum.getAlbum().equals(Admin.getSong(sourceFileName).getAlbum())) {
                     return false;
                 }
 
@@ -724,32 +727,12 @@ public final class Admin {
             if (user.getUserType().equals(Enums.UserType.NORMAL)) {
 
                 UserWrapped userWrapped = user.getPlayer().getWrapped();
-//                System.out.println(userWrapped.getAdMonetization());
-                putFreeRevenue(totalSongEarnings, userWrapped.getFreeSongRevenue());
-                putAdMonetization(userWrapped.getAdMonetization());
-                List<String> checkedArtists = new ArrayList<>();
+                putRevenue(totalSongEarnings, userWrapped.getFreeSongRevenue());
+                putRevenue(totalSongEarnings, userWrapped.getPremiumSongRevenue());
+                putMonetization(userWrapped.getMonetization());
 
-                for (Map.Entry<StringPair, Integer> entry1 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
-                    double artistListens = 0.0;
-                    double totalSongs = 0.0;
-                    for (Map.Entry<StringPair, Integer> entry2 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
-                        totalSongs += entry2.getValue();
-                    }
+                calculatePremiumRevenue(userWrapped, totalSongEarnings);
 
-                    for (Map.Entry<StringPair, Integer> entry2 : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
-                        if (!checkedArtists.contains(entry2.getKey().getS2()) && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
-                            artistListens += entry2.getValue();
-                            Double revenue =  entry2.getValue() * VALUE / totalSongs;
-                            if (totalSongEarnings.containsKey(entry2.getKey())) {
-                                totalSongEarnings.put(entry2.getKey(), revenue + totalSongEarnings.get(entry2.getKey()));
-                            } else {
-                                totalSongEarnings.put(entry2.getKey(), revenue);
-                            }
-                        }
-                    }
-                    checkedArtists.add(entry1.getKey().getS2());
-                    addNewMonetization(artistListens, totalSongs, entry1.getKey().getS2());
-                }
                 if (userWrapped.getTopSongsWithArtistPremium().isEmpty()) {
                     for (Map.Entry<String, Integer> entry : userWrapped.getTopArtists().entrySet()) {
                         if (!monetization.containsKey(entry.getKey())) {
@@ -766,17 +749,50 @@ public final class Admin {
         return monetization;
     }
 
-    private static void putFreeRevenue(Map<StringPair, Double> totalSongEarnings, Map<StringPair, Double> freeSongRevenue) {
+    private static void calculatePremiumRevenue(UserWrapped userWrapped,
+                                                Map<StringPair, Double> totalSongEarnings) {
+        List<String> checkedArtists = new ArrayList<>();
+        for (Map.Entry<StringPair, Integer> entry1
+                : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
+            double artistListens = 0.0;
+            double totalSongs = 0.0;
+            for (Map.Entry<StringPair, Integer> entry2
+                    : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
+                totalSongs += entry2.getValue();
+            }
+
+            for (Map.Entry<StringPair, Integer> entry2
+                    : userWrapped.getTopSongsWithArtistPremium().entrySet()) {
+                if (!checkedArtists.contains(entry2.getKey().getS2())
+                        && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
+                    artistListens += entry2.getValue();
+                    Double revenue =  entry2.getValue() * VALUE / totalSongs;
+                    if (totalSongEarnings.containsKey(entry2.getKey())) {
+                        totalSongEarnings.put(entry2.getKey(),
+                                              revenue + totalSongEarnings.get(entry2.getKey()));
+                    } else {
+                        totalSongEarnings.put(entry2.getKey(), revenue);
+                    }
+                }
+            }
+            checkedArtists.add(entry1.getKey().getS2());
+            addNewMonetization(artistListens, totalSongs, entry1.getKey().getS2());
+        }
+    }
+
+    private static void putRevenue(Map<StringPair, Double> totalSongEarnings,
+                                       Map<StringPair, Double> freeSongRevenue) {
         for (Map.Entry<StringPair, Double> entry : freeSongRevenue.entrySet()) {
             if (totalSongEarnings.containsKey(entry.getKey())) {
-                totalSongEarnings.put(entry.getKey(), entry.getValue() + totalSongEarnings.get(entry.getKey()));
+                totalSongEarnings.put(entry.getKey(),
+                                      entry.getValue() + totalSongEarnings.get(entry.getKey()));
             } else {
                 totalSongEarnings.put(entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private static void putAdMonetization(Map<String, Monetization> adMonetization) {
+    private static void putMonetization(Map<String, Monetization> adMonetization) {
         for (Map.Entry<String, Monetization> entry : adMonetization.entrySet()) {
             if (monetization.containsKey(entry.getKey())) {
                 Monetization newMonetization = monetization.get(entry.getKey());

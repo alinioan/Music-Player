@@ -20,6 +20,7 @@ public class UserWrapped extends Wrapped {
     private Map<String, Integer> topGenres;
     private Map<String, Integer> topSongs;
     private Map<String, Integer> topAlbums;
+
     @JsonIgnore
     private Map<StringPair, Integer> topAlbumsWithArtist;
     @JsonIgnore
@@ -28,10 +29,16 @@ public class UserWrapped extends Wrapped {
     private Map<StringPair, Integer> topSongsWithArtistPremium;
     @JsonIgnore
     private Map<StringPair, Integer> topSongsWithArtistFree;
+
     @JsonIgnore
-    private Map<String, Monetization> adMonetization;
+    private static final double VALUE = 1000000.0;
+    @JsonIgnore
+    private Map<StringPair, Double> premiumSongRevenue;
+    @JsonIgnore
+    private Map<String, Monetization> monetization;
     @JsonIgnore
     private Map<StringPair, Double> freeSongRevenue;
+
     private Map<String, Integer> topEpisodes;
     @JsonIgnore
     private Map<StringPair, Integer> topEpisodesWithHost;
@@ -47,7 +54,8 @@ public class UserWrapped extends Wrapped {
         topEpisodes = new HashMap<>();
         topSongsWithArtistFree = new HashMap<>();
         freeSongRevenue = new HashMap<>();
-        adMonetization = new HashMap<>();
+        premiumSongRevenue = new HashMap<>();
+        monetization = new HashMap<>();
         topEpisodesWithHost = new HashMap<>();
     }
 
@@ -74,7 +82,8 @@ public class UserWrapped extends Wrapped {
         return sortedWrapped;
     }
 
-    public void updateStats(AudioFile file, Enums.PlayerSourceType type, boolean premium, String hostName) {
+    public void updateStats(final AudioFile file, final Enums.PlayerSourceType type,
+                            final boolean premium, final String hostName) {
         switch (type) {
             case LIBRARY, PLAYLIST -> {
                 Song song = (Song) file;
@@ -106,24 +115,7 @@ public class UserWrapped extends Wrapped {
         }
     }
 
-    public void songOverwritten(AudioFile file, Enums.PlayerSourceType type, boolean premium) {
-        switch (type) {
-            case LIBRARY, PLAYLIST -> {
-                Song song = (Song) file;
-                StringPair pairSong = new StringPair(song.getName(), song.getArtist());
-
-                if (!premium && topSongsWithArtistFree.containsKey(pairSong)) {
-                    topSongsWithArtistFree.put(pairSong, topSongsWithArtistFree.get(pairSong) - 1);
-//                    updateMap(topSongsWithArtistFree, pairSong);
-                }
-            }
-            default -> {
-
-            }
-        }
-    }
-
-    private <K> void updateMap(Map<K, Integer> map, K key) {
+    private <K> void updateMap(final Map<K, Integer> map, final K key) {
         if (map.containsKey(key)) {
             map.put(key, map.get(key) + 1);
         } else {
@@ -131,7 +123,41 @@ public class UserWrapped extends Wrapped {
         }
     }
 
-    public void calculateAdRevenue(int price) {
+    public void calculatePremiumRevenue() {
+        List<String> checkedArtists = new ArrayList<>();
+
+        for (Map.Entry<StringPair, Integer> entry1 : topSongsWithArtistPremium.entrySet()) {
+            double artistListens = 0.0;
+            double totalSongs = 0.0;
+            for (Map.Entry<StringPair, Integer> entry2 : topSongsWithArtistPremium.entrySet()) {
+                totalSongs += entry2.getValue();
+            }
+
+            for (Map.Entry<StringPair, Integer> entry2 : topSongsWithArtistPremium.entrySet()) {
+                if (!checkedArtists.contains(entry2.getKey().getS2())
+                        && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
+                    artistListens += entry2.getValue();
+                    Double revenue =  entry2.getValue() * VALUE / totalSongs;
+                    if (premiumSongRevenue.containsKey(entry2.getKey())) {
+                        premiumSongRevenue.put(entry2.getKey(),
+                                revenue + premiumSongRevenue.get(entry2.getKey()));
+                    } else {
+                        premiumSongRevenue.put(entry2.getKey(), revenue);
+                    }
+                }
+            }
+            checkedArtists.add(entry1.getKey().getS2());
+            addNewMonetization(artistListens, totalSongs, entry1.getKey().getS2(), (int) VALUE);
+        }
+        topSongsWithArtistPremium.clear();
+    }
+
+    /**
+     * Calculate ad revenue.
+     *
+     * @param price the price of the ad.
+     */
+    public void calculateAdRevenue(final int price) {
         List<String> checkedArtists = new ArrayList<>();
 
         for (Map.Entry<StringPair, Integer> entry1 : topSongsWithArtistFree.entrySet()) {
@@ -142,11 +168,13 @@ public class UserWrapped extends Wrapped {
             }
 
             for (Map.Entry<StringPair, Integer> entry2 : topSongsWithArtistFree.entrySet()) {
-                if (!checkedArtists.contains(entry2.getKey().getS2()) && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
+                if (!checkedArtists.contains(entry2.getKey().getS2())
+                        && entry2.getKey().getS2().equals(entry1.getKey().getS2())) {
                     artistListens += entry2.getValue();
                     Double revenue =  entry2.getValue() * price / totalSongs;
                     if (freeSongRevenue.containsKey(entry2.getKey())) {
-                        freeSongRevenue.put(entry2.getKey(), revenue + freeSongRevenue.get(entry2.getKey()));
+                        freeSongRevenue.put(entry2.getKey(),
+                                revenue + freeSongRevenue.get(entry2.getKey()));
                     } else {
                         freeSongRevenue.put(entry2.getKey(), revenue);
                     }
@@ -155,18 +183,18 @@ public class UserWrapped extends Wrapped {
             checkedArtists.add(entry1.getKey().getS2());
             addNewMonetization(artistListens, totalSongs, entry1.getKey().getS2(), price);
         }
-//        System.out.println(price + " " + adMonetization);
         topSongsWithArtistFree.clear();
     }
 
-    private void addNewMonetization(double artistListens, double totalSongs, String artist, int price) {
+    private void addNewMonetization(final double artistListens, final double totalSongs,
+                                    final String artist, final int price) {
         double songRevenue = artistListens * price / totalSongs;
-        if (adMonetization.containsKey(artist)) {
-            Monetization newMonetization = adMonetization.get(artist);
+        if (monetization.containsKey(artist)) {
+            Monetization newMonetization = monetization.get(artist);
             newMonetization.setSongRevenue(newMonetization.getSongRevenue() + songRevenue);
-            adMonetization.put(artist, newMonetization);
+             monetization.put(artist, newMonetization);
         } else {
-            adMonetization.put(artist, new Monetization(0.0, songRevenue));
+            monetization.put(artist, new Monetization(0.0, songRevenue));
         }
     }
 

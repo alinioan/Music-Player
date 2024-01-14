@@ -6,6 +6,8 @@ import app.audio.Files.Song;
 import app.page.Visitable;
 import app.page.Visitor;
 import app.user.User;
+import app.user.artist.Artist;
+import app.user.wrapped.ArtistWrapped;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -85,15 +87,39 @@ public final class HomePage implements Visitable {
     }
 
     public String recommendPlaylist(User user) {
-        playlistRecommendations.add("%s's recommendations".formatted(user.getUsername()));
+        if (user.getLikedSongs().isEmpty() && user.getPlaylists().isEmpty()
+                && user.getFollowedPlaylists().isEmpty()) {
+            return "No new recommendations were found";
+        }
 
+        playlistRecommendations.add("%s's recommendations".formatted(user.getUsername()));
         return ("The recommendations for user " +
                 "%s have been updated successfully.").formatted(user.getUsername());
     }
 
     public String recommendFanPlaylist(User user) {
-        playlistRecommendations.add("%s Fan Club recommendations"
-                .formatted(((Song) user.getPlayer().getSource().getAudioFile()).getArtist()));
+        Artist artist = (Artist) Admin.getUser(((Song) user.getPlayer()
+                            .getSource().getAudioFile()).getArtist());
+        ArtistWrapped wrapped = artist.getTemporaryWrapped();
+        wrapped.setTopFans(new ArrayList<>(wrapped.sortAndRetrieveTop5(wrapped
+                                                    .getTopFansMap()).keySet()));
+        if (wrapped.getListeners() == 0) {
+            return "No new recommendations were found";
+        }
+        if (wrapped.getTopFans() != null) {
+            boolean playlistCreated = false;
+            for (String username : wrapped.getTopFans()) {
+                User fan = Admin.getUser(username);
+                if (!fan.getLikedSongs().isEmpty() || !fan.getPlaylists().isEmpty()
+                        || !fan.getFollowedPlaylists().isEmpty()) {
+                    playlistCreated = true;
+                }
+            }
+            if (playlistCreated == false) {
+                return "No new recommendations were found";
+            }
+        }
+        playlistRecommendations.add("%s Fan Club recommendations".formatted(artist.getUsername()));
         return ("The recommendations for user " +
                 "%s have been updated successfully.").formatted(user.getUsername());
     }

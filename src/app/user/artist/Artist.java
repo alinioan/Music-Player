@@ -10,6 +10,7 @@ import app.user.wrapped.UserWrapped;
 import app.user.wrapped.Wrapped;
 import app.utils.Enums;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Artist extends User {
     private ArrayList<Album> albums;
     private ArrayList<Event> events;
     private ArrayList<Merch> merches;
+    @Setter
     private ArtistWrapped artistWrapped;
     private List<User> subscribers;
 
@@ -203,6 +205,15 @@ public class Artist extends User {
             }
         }
         return null;
+    }
+
+    public ArtistWrapped getTemporaryWrapped() {
+        ArtistWrapped temporaryWrapped = new ArtistWrapped();
+        for (User user : Admin.getUsers()) {
+            UserWrapped userWrapped = user.getPlayer().getWrapped();
+            temporaryWrapped.updateStats(userWrapped, this, user.getUsername());
+        }
+        return temporaryWrapped;
     }
 
     @Override

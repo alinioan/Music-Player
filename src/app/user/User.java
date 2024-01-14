@@ -159,9 +159,6 @@ public class User implements Comparable<User>, NotificationObserver {
      * @return the string
      */
     public String load() {
-        if (player.getSource() != null && player.getSource().getDuration() > 0) {
-            player.getWrapped().songOverwritten(player.getSource().getAudioFile(), player.getSource().getType(), premium);
-        }
         if (searchBar.getLastSelected() == null) {
             return "Please select a source before attempting to load.";
         }
@@ -583,6 +580,7 @@ public class User implements Comparable<User>, NotificationObserver {
         if (!isPremium()) {
             return username + " is not a premium user.";
         }
+        player.getWrapped().calculatePremiumRevenue();
         premium = false;
         player.setPremium(premium);
         return username + " cancelled the subscription successfully.";
