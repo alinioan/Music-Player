@@ -1,7 +1,5 @@
 package app.page;
 
-import app.Admin;
-import app.audio.Files.Song;
 import app.page.content.ArtistPage;
 import app.page.content.HomePage;
 import app.page.content.HostPage;
@@ -122,7 +120,14 @@ public final class PageManager {
         return user.getUsername() + " accessed " + nextPage + " successfully.";
     }
 
-    public static String updateRecommendations(User user, String recommendation) {
+    /**
+     * Update recommendations.
+     *
+     * @param user the user to update recommendations for.
+     * @param recommendation the recommendation type.
+     * @return the message.
+     */
+    public static String updateRecommendations(final User user, final String recommendation) {
         if (user.getUserType() != Enums.UserType.NORMAL) {
             return user.getUsername() + " is not a normal user.";
         }

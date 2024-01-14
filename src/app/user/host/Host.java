@@ -105,6 +105,11 @@ public class Host extends User {
         return podcastOutputs;
     }
 
+    /**
+     * Get wrapped stats.
+     *
+     * @return the wrapped.
+     */
     public Wrapped getWrapped() {
         for (User user : Admin.getUsers()) {
             UserWrapped userWrapped = user.getPlayer().getWrapped();

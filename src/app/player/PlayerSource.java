@@ -176,7 +176,7 @@ public class PlayerSource {
      *
      * @param shuffle the shuffle
      */
-    public void setPrevAudioFile(final boolean shuffle, UserWrapped wrapped) {
+    public void setPrevAudioFile(final boolean shuffle, final UserWrapped wrapped) {
         if (type == Enums.PlayerSourceType.LIBRARY) {
             remainedDuration = audioFile.getDuration();
         } else {
@@ -232,7 +232,7 @@ public class PlayerSource {
      *
      * @param duration the duration
      */
-    public void skip(final int duration, UserWrapped wrapped) {
+    public void skip(final int duration, final UserWrapped wrapped) {
         remainedDuration += duration;
         if (remainedDuration > audioFile.getDuration()) {
             remainedDuration = 0;
@@ -243,7 +243,7 @@ public class PlayerSource {
         }
     }
 
-    private void updateAudioFile(UserWrapped wrapped) {
+    private void updateAudioFile(final UserWrapped wrapped) {
         if (adQueued) {
             setAudioFile(Admin.getSong("Ad Break"));
             wrapped.calculateAdRevenue(adPrice);
@@ -251,7 +251,8 @@ public class PlayerSource {
             index--;
         } else {
             setAudioFile(audioCollection.getTrackByIndex(index));
-            wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(), premium, audioCollection.getOwner());
+            wrapped.updateStats(audioCollection.getTrackByIndex(index), this.getType(),
+                                premium, audioCollection.getOwner());
         }
     }
 

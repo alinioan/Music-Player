@@ -62,7 +62,8 @@ public class Artist extends User {
         super.getPlaylists().add(album);
         this.albums.add(album);
         for (User subscriber : subscribers) {
-            subscriber.updateNotifications("New Album", "New Album from %s.".formatted(getUsername()));
+            subscriber.updateNotifications("New Album",
+                    "New Album from %s.".formatted(getUsername()));
         }
         return this.getUsername() + " has added new album successfully.";
     }
@@ -114,7 +115,8 @@ public class Artist extends User {
         }
         this.events.add(newEvent);
         for (User subscriber : subscribers) {
-            subscriber.updateNotifications("New Event", "New Event from %s.".formatted(getUsername()));
+            subscriber.updateNotifications("New Event",
+                    "New Event from %s.".formatted(getUsername()));
         }
         return this.getUsername() + " has added new event successfully.";
     }
@@ -165,7 +167,8 @@ public class Artist extends User {
         }
         this.merches.add(newMerch);
         for (User subscriber : subscribers) {
-            subscriber.updateNotifications("New Merchandise", "New Merchandise from %s.".formatted(getUsername()));
+            subscriber.updateNotifications("New Merchandise",
+                    "New Merchandise from %s.".formatted(getUsername()));
         }
         return this.getUsername() + " has added new merchandise successfully.";
     }
@@ -198,15 +201,11 @@ public class Artist extends User {
         return likes;
     }
 
-    public Album getAlbum(final String name) {
-        for (Album album : albums) {
-            if (album.getName().equals(name)) {
-                return album;
-            }
-        }
-        return null;
-    }
-
+    /**
+     * Get temporary wrapped.
+     *
+     * @return the ArtistWrapped.
+     */
     public ArtistWrapped getTemporaryWrapped() {
         ArtistWrapped temporaryWrapped = new ArtistWrapped();
         for (User user : Admin.getUsers()) {
@@ -216,6 +215,11 @@ public class Artist extends User {
         return temporaryWrapped;
     }
 
+    /**
+     * Get wrapped stats.
+     *
+     * @return the wrapped.
+     */
     @Override
     public Wrapped getWrapped() {
         for (User user : Admin.getUsers()) {

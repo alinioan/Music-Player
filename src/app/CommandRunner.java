@@ -29,6 +29,7 @@ import java.util.Map;
  */
 public final class CommandRunner {
     private static CommandRunner instance;
+
     /**
      * The Object mapper.
      */
@@ -37,6 +38,11 @@ public final class CommandRunner {
     private CommandRunner() {
     }
 
+    /**
+     * Get instance.
+     *
+     * @return the instance.
+     */
     public static CommandRunner getInstance() {
         if (instance == null) {
             instance = new CommandRunner();
@@ -1013,22 +1019,26 @@ public final class CommandRunner {
             if ((userWrapped.getTopArtists().isEmpty() && userWrapped.getTopSongs().isEmpty()
                 && userWrapped.getTopAlbums().isEmpty() && userWrapped.getTopEpisodes().isEmpty()
                 && userWrapped.getTopGenres().isEmpty())) {
-                objectNode.put("message", "No data to show for user " + user.getUsername() + ".");
+                objectNode.put("message",
+                            "No data to show for user " + user.getUsername() + ".");
             } else {
                 objectNode.put("result", objectMapper.valueToTree(wrapped));
             }
         } else if (user.getUserType().equals(Enums.UserType.ARTIST)) {
             ArtistWrapped artistWrapped = (ArtistWrapped) wrapped;
             if ((artistWrapped.getListeners() == 0 && artistWrapped.getTopSongs().isEmpty()
-                    && artistWrapped.getTopAlbums().isEmpty() && artistWrapped.getTopFans().isEmpty())) {
-                objectNode.put("message", "No data to show for artist " + user.getUsername() + ".");
+                && artistWrapped.getTopAlbums().isEmpty()
+                && artistWrapped.getTopFans().isEmpty())) {
+                objectNode.put("message",
+                            "No data to show for artist " + user.getUsername() + ".");
             } else {
                 objectNode.put("result", objectMapper.valueToTree(wrapped));
             }
         } else {
             HostWrapped hostWrapped = (HostWrapped) wrapped;
             if ((hostWrapped.getListeners() == 0 && hostWrapped.getTopEpisodes().isEmpty())) {
-                objectNode.put("message", "No data to show for host " + user.getUsername() + ".");
+                objectNode.put("message",
+                            "No data to show for host " + user.getUsername() + ".");
             } else {
                 objectNode.put("result", objectMapper.valueToTree(wrapped));
             }
@@ -1092,13 +1102,8 @@ public final class CommandRunner {
         if (!objectNode.isEmpty()) {
             return objectNode;
         }
-        boolean isLoad = false;
-        if (nextCommand.getCommand().equals("search")
-                || nextCommand.getUsername().equals(commandInput.getUsername())) {
-            isLoad = true;
-        }
-        String message = user.adBreak(commandInput.getPrice(), commandInput.getTimestamp(),
-                                      nextCommand.getTimestamp(), isLoad);
+
+        String message = user.adBreak(commandInput.getPrice());
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
@@ -1203,7 +1208,8 @@ public final class CommandRunner {
             return objectNode;
         }
 
-        String message = PageManager.updateRecommendations(user, commandInput.getRecommendationType());
+        String message = PageManager.updateRecommendations(user,
+                                                           commandInput.getRecommendationType());
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());

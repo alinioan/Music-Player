@@ -1,5 +1,11 @@
 package app.notifications;
 
 public interface NotificationObserver {
-    public void updateNotifications(String name, String description);
+    /**
+     * Update notifications.
+     *
+     * @param name the name.
+     * @param description the description.
+     */
+    void updateNotifications(String name, String description);
 }

@@ -8,7 +8,6 @@ import app.audio.LibraryEntry;
 import app.user.wrapped.UserWrapped;
 import app.utils.Enums;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public final class Player {
     /**
      * Instantiates a new Player.
      */
-    public Player(boolean premium) {
+    public Player(final boolean premium) {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.paused = true;
         this.connectionStatus = true;
@@ -76,33 +75,37 @@ public final class Player {
      *
      * @param type      the type
      * @param entry     the entry
-     * @param bookmarks the bookmarks
+     * @param bookmarkList the bookmarks
      * @return the player source
      */
-    public PlayerSource createSource(final String type,
-                                            final LibraryEntry entry,
-                                            final List<PodcastBookmark> bookmarks) {
-        if ("song".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry, premium, adPrice, adQueued);
-        } else if ("playlist".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium, adPrice, adQueued);
-        } else if ("podcast".equals(type)) {
-            return createPodcastSource((AudioCollection) entry, bookmarks);
-        } else if ("album".equals(type)) {
-            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry, premium, adPrice, adQueued);
+    public PlayerSource createSource(final String fileType,
+                                     final LibraryEntry entry,
+                                     final List<PodcastBookmark> bookmarkList) {
+        if ("song".equals(fileType)) {
+            return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry,
+                    premium, adPrice, adQueued);
+        } else if ("playlist".equals(fileType)) {
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry,
+                    premium, adPrice, adQueued);
+        } else if ("podcast".equals(fileType)) {
+            return createPodcastSource((AudioCollection) entry, bookmarkList);
+        } else if ("album".equals(fileType)) {
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry,
+                    premium, adPrice, adQueued);
         }
 
         return null;
     }
 
     private PlayerSource createPodcastSource(final AudioCollection collection,
-                                                    final List<PodcastBookmark> bookmarks) {
-        for (PodcastBookmark bookmark : bookmarks) {
+                                             final List<PodcastBookmark> bookmarkList) {
+        for (PodcastBookmark bookmark : bookmarkList) {
             if (bookmark.getName().equals(collection.getName())) {
                 return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, bookmark);
             }
         }
-        return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, premium, adPrice, adQueued);
+        return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection,
+                                premium, adPrice, adQueued);
     }
 
     /**
@@ -116,13 +119,16 @@ public final class Player {
             bookmarkPodcast();
         }
         if (sourceType.equals("song")) {
-            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY, premium, null);
+            wrapped.updateStats((AudioFile) entry, Enums.PlayerSourceType.LIBRARY,
+                    premium, null);
         }
         if (sourceType.equals("playlist") || sourceType.equals("album")) {
-            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0), Enums.PlayerSourceType.PLAYLIST, premium, null);
+            wrapped.updateStats(((Playlist) entry).getTrackByIndex(0),
+                    Enums.PlayerSourceType.PLAYLIST, premium, null);
         }
         if (sourceType.equals("podcast")) {
-            wrapped.updateStats(((Podcast) entry).getTrackByIndex(0), Enums.PlayerSourceType.PODCAST, premium, ((Podcast) entry).getOwner());
+            wrapped.updateStats(((Podcast) entry).getTrackByIndex(0),
+                    Enums.PlayerSourceType.PODCAST, premium, ((Podcast) entry).getOwner());
         }
         this.adQueued = false;
         this.adPrice = 0;
@@ -303,7 +309,7 @@ public final class Player {
      *
      * @param connectionStatus The boolean value representing the connection status to be set.
      */
-    public void setConnectionStatus(boolean connectionStatus) {
+    public void setConnectionStatus(final boolean connectionStatus) {
         this.connectionStatus = connectionStatus;
     }
 
@@ -325,22 +331,26 @@ public final class Player {
         return new PlayerStats(filename, duration, repeatMode, shuffle, paused);
     }
 
-    public void setPremium(boolean premium) {
+    /**
+     * Set premium status.
+     *
+     * @param premium premium status.
+     */
+    public void setPremium(final boolean premium) {
         this.premium = premium;
         if (source != null) {
             source.setPremium(premium);
         }
     }
 
-    public boolean queueAd(final int price, final int timestamp,
-                           final int nextTimestamp, final boolean isLoad) {
+    /**
+     * Queue an ad.
+     *
+     * @param price the ad price.
+     * @return true if add is queued successfully
+     */
+    public boolean queueAd(final int price) {
         if (this.source != null && !this.source.getAudioFile().getName().equals("Ad Break")) {
-//            if (isLoad && timestamp + source.getDuration() <= nextTimestamp) {
-////                System.out.println("Good ad!!!! " + timestamp + "time from ad to load: " + (nextTimestamp - timestamp - source.getDuration()));
-//                wrapped.calculateAdRevenue(price);
-//            } else {
-////                System.out.println("Bad ad: " + timestamp + "time from ad to load: " + (nextTimestamp - timestamp - source.getDuration()));
-//            }
             this.adQueued = true;
             this.adPrice = price;
             this.source.setAdQueued(true);

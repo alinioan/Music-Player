@@ -4,14 +4,16 @@ import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.user.Monetization;
-import app.user.User;
 import app.utils.Enums;
 import app.utils.StringPair;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -59,11 +61,16 @@ public class UserWrapped extends Wrapped {
         topEpisodesWithHost = new HashMap<>();
     }
 
-    public UserWrapped(UserWrapped wrapped) {
+    /**
+     * Copy constructor.
+     *
+     * @param wrapped the instance.
+     */
+    public UserWrapped(final UserWrapped wrapped) {
         this.topArtists = wrapped.getTopArtists();
         this.topEpisodes = wrapped.getTopEpisodes();
         this.topGenres = wrapped.getTopGenres();
-        this.topAlbums= wrapped.getTopAlbums();
+        this.topAlbums = wrapped.getTopAlbums();
         this.topAlbumsWithArtist = wrapped.getTopAlbumsWithArtist();
         this.topSongsWithArtist = wrapped.getTopSongsWithArtist();
         topSongsWithArtistPremium = wrapped.getTopSongsWithArtistPremium();
@@ -71,6 +78,11 @@ public class UserWrapped extends Wrapped {
         this.topEpisodesWithHost = wrapped.getTopEpisodesWithHost();
     }
 
+    /**
+     * Sort and return wrapped stats.
+     *
+     * @return the sorted wrapped.
+     */
     @JsonIgnore
     public Wrapped getSortedWrapped() {
         UserWrapped sortedWrapped = new UserWrapped();
@@ -82,6 +94,14 @@ public class UserWrapped extends Wrapped {
         return sortedWrapped;
     }
 
+    /**
+     * Update wrapped stats.
+     *
+     * @param file the audio file.
+     * @param type the type of the file.
+     * @param premium if the user is premium.
+     * @param hostName name of the host he is listening to.
+     */
     public void updateStats(final AudioFile file, final Enums.PlayerSourceType type,
                             final boolean premium, final String hostName) {
         switch (type) {
@@ -123,6 +143,9 @@ public class UserWrapped extends Wrapped {
         }
     }
 
+    /**
+     * Calculate premium revenue.
+     */
     public void calculatePremiumRevenue() {
         List<String> checkedArtists = new ArrayList<>();
 
@@ -186,6 +209,14 @@ public class UserWrapped extends Wrapped {
         topSongsWithArtistFree.clear();
     }
 
+    /**
+     * Add new monetization to users stats.
+     *
+     * @param artistListens listens for that artist.
+     * @param totalSongs total songs listened to.
+     * @param artist the artist.
+     * @param price the price of the monetization (ad price or subscription price).
+     */
     private void addNewMonetization(final double artistListens, final double totalSongs,
                                     final String artist, final int price) {
         double songRevenue = artistListens * price / totalSongs;

@@ -24,7 +24,7 @@ public class Invoker {
      *
      * @param command the command
      */
-    public void execute(PageCommand command) {
+    public void execute(final PageCommand command) {
         command.execute();
         commandStack.push(command);
     }
@@ -39,7 +39,8 @@ public class Invoker {
     }
 
     /**
-     * Redo command previously undone. Cannot perform a redo after an execute, only after at least one undo.
+     * Redo command previously undone. Cannot perform a redo after an execute,
+     * only after at least one undo.
      */
     public void redo() {
         if (!undoStack.isEmpty()) {

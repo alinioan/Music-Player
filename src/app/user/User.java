@@ -563,10 +563,20 @@ public class User implements Comparable<User>, NotificationObserver {
         return username + " has changed status successfully.";
     }
 
+    /**
+     * Get wrapped stats.
+     *
+     * @return the wrapped.
+     */
     public Wrapped getWrapped() {
         return player.getWrapped().getSortedWrapped();
     }
 
+    /**
+     * Buy premium membership.
+     *
+     * @return the message.
+     */
     public String buyPremium() {
         if (isPremium()) {
             return username + " is already a premium user.";
@@ -576,6 +586,11 @@ public class User implements Comparable<User>, NotificationObserver {
         return username + " bought the subscription successfully.";
     }
 
+    /**
+     * Cancel premium membership.
+     *
+     * @return the message.
+     */
     public String cancelPremium() {
         if (!isPremium()) {
             return username + " is not a premium user.";
@@ -586,17 +601,29 @@ public class User implements Comparable<User>, NotificationObserver {
         return username + " cancelled the subscription successfully.";
     }
 
-    public String adBreak(final int price, final int timestamp,
-                          final int nextTimestamp, final boolean isLoad) {
-        if (player.queueAd(price, timestamp, nextTimestamp, isLoad)) {
+    /**
+     * Queue an ad break.
+     *
+     * @param price the ad price.
+     * @return the message.
+     */
+    public String adBreak(final int price) {
+        if (player.queueAd(price)) {
             return "Ad inserted successfully.";
         }
         return username + " is not playing any music.";
     }
 
+    /**
+     * Buy merch.
+     *
+     * @param merchName the merch name.
+     * @return the message.
+     */
     public String buyMerch(final String merchName) {
         ArtistPage artistPage = null;
-        if (selectedCreator != null && Admin.getUser(selectedCreator).getUserType() == Enums.UserType.ARTIST) {
+        if (selectedCreator != null
+                && Admin.getUser(selectedCreator).getUserType() == Enums.UserType.ARTIST) {
             artistPage = PageManager.getArtistPageHashMap().get(selectedCreator);
         } else {
             return "Cannot buy merch from this page.";
@@ -615,6 +642,11 @@ public class User implements Comparable<User>, NotificationObserver {
         return username + " has added new merch successfully.";
     }
 
+    /**
+     * Subscribe to a creator.
+     *
+     * @return the message.
+     */
     public String subscribe() {
         if (selectedCreator == null) {
             return "To subscribe you need to be on the page of an artist or host.";
@@ -636,6 +668,11 @@ public class User implements Comparable<User>, NotificationObserver {
         }
     }
 
+    /**
+     * Load recommendations.
+     *
+     * @return the message.
+     */
     public String loadRecommendation() {
         HomePage homePage = PageManager.getHomePageHashMap().get(username);
         if (homePage.getSongRecommendations().isEmpty()
@@ -649,6 +686,11 @@ public class User implements Comparable<User>, NotificationObserver {
         return "Playback loaded successfully.";
     }
 
+    /**
+     * Change to next page.
+     *
+     * @return the message.
+     */
     public String nextPage() {
         if (invoker.getUndoStack().isEmpty()) {
             return "There are no pages left to go forward.";
@@ -657,6 +699,11 @@ public class User implements Comparable<User>, NotificationObserver {
         return "The user %s has navigated successfully to the next page.".formatted(username);
     }
 
+    /**
+     * Change to previous page.
+     *
+     * @return the message.
+     */
     public String previousPage() {
         if (invoker.getCommandStack().isEmpty()) {
             return "There are no pages left to go back.";
@@ -685,8 +732,14 @@ public class User implements Comparable<User>, NotificationObserver {
         return userType.compareTo(o.getUserType());
     }
 
+    /**
+     * Update notifications.
+     *
+     * @param name notification name.
+     * @param description notification description.
+     */
     @Override
-    public void updateNotifications(String name, String description) {
+    public void updateNotifications(final String name, final String description) {
         Notification notification = new Notification(name, description);
         notifications.add(notification);
     }

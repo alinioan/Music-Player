@@ -15,18 +15,22 @@ public class ChangePageCommand implements PageCommand {
     private Enums.UserType oldType;
     private String oldPage;
 
-    public ChangePageCommand(User user, String page) {
+    public ChangePageCommand(final User user, final String page) {
         this.user = user;
         this.page = page;
     }
 
+    /**
+     * Go to next page.
+     */
     @Override
     public void execute() {
         oldCreator = user.getSelectedCreator();
         oldType = user.getCreatorType();
         user.setSelectedCreator(null);
         user.setCreatorType(null);
-        if ((page.equals("Host") || page.equals("Artist")) && user.getPlayer().getSource() != null) {
+        if ((page.equals("Host") || page.equals("Artist"))
+                && user.getPlayer().getSource() != null) {
             switch (user.getPlayer().getSource().getType()) {
                 case LIBRARY -> {
                     Artist artist = (Artist) Admin.getUser(((Song) user.getPlayer()
@@ -65,6 +69,9 @@ public class ChangePageCommand implements PageCommand {
         }
     }
 
+    /**
+     * Go to previous page.
+     */
     @Override
     public void undo() {
         user.setCreatorType(oldType);
