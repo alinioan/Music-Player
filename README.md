@@ -6,8 +6,6 @@
 
 ### 322CA
 
-Am folosit rezolvarea oficiala de la etapa 1 si dupa am continuat cu implemetarea pentru etapa 2.
-
 ## Structure:
 * **Pages**:
   * **PageManager**:
